@@ -1,0 +1,18 @@
+[build-system]
+requires = ["setuptools>=42.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+# mypy configuration
+[tool.mypy]
+python_version = "3.8"
+namespace_packages = true
+files = [
+  "src/orbitalcoms",
+]
+strict = true
+
+[[tool.mypy.overrides]]
+module = [
+  "serial",
+]
+ignore_missing_imports = true
