@@ -16,3 +16,9 @@ module = [
   "serial",
 ]
 ignore_missing_imports = true
+
+[tool.isort]
+profile = "black"
+src_paths = [
+  "src/orbitalcoms",
+]
