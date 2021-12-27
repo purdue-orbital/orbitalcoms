@@ -22,3 +22,8 @@ profile = "black"
 src_paths = [
   "src/orbitalcoms",
 ]
+
+[tool.pytest.ini_options]
+testpaths = [
+  "tests",
+]
