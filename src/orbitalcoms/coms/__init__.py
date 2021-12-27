@@ -4,7 +4,7 @@ from .drivers import (
     LocalComsDriver,
     SerialComsDriver,
 )
-from .errors import ComsDriverReadError, ComsMessageParseError
+from .errors import ComsDriverReadError, ComsDriverWriteError, ComsMessageParseError
 from .messages import ComsMessage, ParsableComType, construct_message
 from .subscribers import ComsSubscriberLike, ComsSubscription, OneTimeComsSubscription
 
@@ -15,6 +15,7 @@ __all__ = [
     "SerialComsDriver",
     "ComsMessageParseError",
     "ComsDriverReadError",
+    "ComsDriverWriteError",
     "ParsableComType",
     "ComsMessage",
     "construct_message",
