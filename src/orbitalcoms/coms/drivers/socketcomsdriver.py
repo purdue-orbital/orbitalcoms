@@ -31,8 +31,12 @@ class SocketComsDriver(BaseComsDriver):
     def _read(self) -> ComsMessage:
         head = self._sock.recv(self.__HEADER).decode()
         if not head:
-            raise ComsDriverReadError("Invalid header recieved")
-        return ComsMessage.from_string(self._sock.recv(int(head)).decode())
+            raise ComsDriverReadError(f"Invalid header recieved: '{head}'")
+        try:
+            msg = self._sock.recv(int(head)).decode()
+            return ComsMessage.from_string(msg)
+        except Exception as e:
+            raise ComsDriverReadError(f"Invalid message recieved: '{msg}'") from e
 
     def _write(self, m: ParsableComType) -> None:
         msg = construct_message(m).as_str.encode()
