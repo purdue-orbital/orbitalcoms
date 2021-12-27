@@ -30,6 +30,10 @@ class ComsMessage:
     def as_dict(self) -> Dict[str, Any]:
         return dataclasses.asdict(self)
 
+    @property
+    def as_str(self) -> str:
+        return json.dumps(self.as_dict)
+
 
 ParsableComType = Union[ComsMessage, str, dict]
 

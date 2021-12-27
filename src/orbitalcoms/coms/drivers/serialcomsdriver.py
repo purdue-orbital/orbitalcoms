@@ -28,7 +28,7 @@ class SerialComsDriver(BaseComsDriver):
 
     def _write(self, msg: ParsableComType) -> None:
         m = construct_message(msg)
-        self.ser.write(f"{json.dumps(m.as_dict)}&".encode())
+        self.ser.write(f"{m.as_str}&".encode())
         self.ser.flush()
 
     @property
