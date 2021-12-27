@@ -7,7 +7,7 @@ from typing import TYPE_CHECKING, Any, Callable, Optional, Set
 from ..errors import ComsDriverReadError
 from ..subscribers import OneTimeComsSubscription
 
-if TYPE_CHECKING:
+if TYPE_CHECKING:  # pragma: no cover
     from ..messages import ComsMessage, ParsableComType
     from ..subscribers import ComsSubscriberLike
 
@@ -68,7 +68,7 @@ class BaseComsDriver(ABC):
         return message
 
     @abstractmethod
-    def _read(self) -> ComsMessage:
+    def _read(self) -> ComsMessage:  # pragma: no cover
         ...
 
     def write(self, m: ParsableComType, suppress_errors: bool = False) -> bool:
@@ -81,7 +81,7 @@ class BaseComsDriver(ABC):
             raise
 
     @abstractmethod
-    def _write(self, m: ParsableComType) -> None:
+    def _write(self, m: ParsableComType) -> None:  # pragma: no cover
         ...
 
     def register_subscriber(self, sub: ComsSubscriberLike) -> None:

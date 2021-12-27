@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING, Any, Callable, Protocol
 
-if TYPE_CHECKING:
+if TYPE_CHECKING:  # pragma: no cover
     from ..drivers import BaseComsDriver
     from ..messages import ComsMessage
 
@@ -10,7 +10,9 @@ if TYPE_CHECKING:
 class ComsSubscriberLike(Protocol):
     expect_err: bool
 
-    def update(self, message: ComsMessage, driver: BaseComsDriver) -> Any:
+    def update(
+        self, message: ComsMessage, driver: BaseComsDriver
+    ) -> Any:  # pragma: no cover
         ...
 
 

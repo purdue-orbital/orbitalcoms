@@ -50,6 +50,18 @@ def test_construction_from_str():
     assert m.ARMED == 1
 
 
+def test_message_to_str():
+    construct_str = (
+        '{"ABORT": 0, "QDM": 0, "STAB": 0, "LAUNCH": 0, "ARMED": 1, '
+        '"DATA": {"hello": "world"}}'
+    )
+
+    msg_str = ComsMessage.from_string(construct_str).as_str
+
+    assert construct_str is not msg_str
+    assert construct_str == msg_str
+
+
 def test_square_bracket_access():
     m = ComsMessage(
         ABORT=0, LAUNCH=1, STAB=1, QDM=0, DATA={"msg": "a message"}, ARMED=1
