@@ -1,5 +1,3 @@
-import json
-
 import serial
 
 from ..messages import ComsMessage, ParsableComType, construct_message
