@@ -18,6 +18,7 @@ class SerialComsDriver(BaseComsDriver):
                 try:
                     return ComsMessage.from_string(msg)
                 except Exception:
+                    # TODO: Replace error raise
                     print(f"Invalid Messge Recieved: {msg}")
                 finally:
                     msg = ""

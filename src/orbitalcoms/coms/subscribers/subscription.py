@@ -8,13 +8,18 @@ if TYPE_CHECKING:
 
 
 class ComsSubscriberLike(Protocol):
+    expect_err: bool
+
     def update(self, message: ComsMessage, driver: BaseComsDriver) -> Any:
         ...
 
 
-class ComsSubscription:
-    def __init__(self, on_update: Callable[[ComsMessage], Any]) -> None:
+class ComsSubscription(ComsSubscriberLike):
+    def __init__(
+        self, on_update: Callable[[ComsMessage], Any], expect_err: bool = False
+    ) -> None:
         self.on_update = on_update
+        self.expect_err = expect_err
 
     def update(self, message: ComsMessage, _: BaseComsDriver) -> None:
         self.on_update(message)

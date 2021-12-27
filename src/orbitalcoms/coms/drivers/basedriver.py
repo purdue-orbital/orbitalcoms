@@ -36,9 +36,15 @@ class BaseComsDriver(ABC):
             self._read_loop = None
 
     def _spawn_read_loop_thread(self) -> ComsDriverReadLooop:
-        return ComsDriverReadLooop(
-            lambda: self._notify_subscribers(self._read()), daemon=True
-        )
+        def read() -> None:
+            try:
+                msg = self._read()
+            except Exception:
+                # TODO: Add logging here!
+                return
+            self._notify_subscribers(msg)
+
+        return ComsDriverReadLooop(read, daemon=True)
 
     @property
     def is_reading(self) -> bool:
@@ -87,7 +93,12 @@ class BaseComsDriver(ABC):
 
     def _notify_subscribers(self, m: ComsMessage) -> None:
         for s in self.subscrbers.copy():
-            s.update(m, self)
+            try:
+                s.update(m, self)
+            except Exception:
+                # TODO: Add logging here
+                if not s.expect_err:
+                    self.unregister_subscriber(s)
 
 
 class ComsDriverReadLooop(Thread):
