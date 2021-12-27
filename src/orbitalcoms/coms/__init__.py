@@ -3,6 +3,7 @@ from .drivers import (
     ComsDriverReadLooop,
     LocalComsDriver,
     SerialComsDriver,
+    SocketComsDriver,
 )
 from .errors import ComsDriverReadError, ComsDriverWriteError, ComsMessageParseError
 from .messages import ComsMessage, ParsableComType, construct_message
@@ -13,11 +14,12 @@ __all__ = [
     "ComsDriverReadLooop",
     "LocalComsDriver",
     "SerialComsDriver",
-    "ComsMessageParseError",
+    "SocketComsDriver",
     "ComsDriverReadError",
     "ComsDriverWriteError",
-    "ParsableComType",
+    "ComsMessageParseError",
     "ComsMessage",
+    "ParsableComType",
     "construct_message",
     "ComsSubscriberLike",
     "ComsSubscription",
