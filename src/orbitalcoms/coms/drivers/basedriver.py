@@ -2,9 +2,10 @@ from __future__ import annotations
 
 from abc import ABC, abstractmethod
 from threading import Condition, Event, Thread
-from typing import TYPE_CHECKING, Any, Callable, Optional, Set
+import multiprocessing as mp
+from typing import TYPE_CHECKING, Any, Callable, Optional, Set, Tuple
 
-from ..errors import ComsDriverReadError
+from ..errors import ComsDriverReadError, ComsDriverWriteError
 from ..subscribers import OneTimeComsSubscription
 
 if TYPE_CHECKING:
@@ -36,15 +37,9 @@ class BaseComsDriver(ABC):
             self._read_loop = None
 
     def _spawn_read_loop_thread(self) -> ComsDriverReadLooop:
-        def read() -> None:
-            try:
-                msg = self._read()
-            except Exception:
-                # TODO: Add logging here!
-                return
-            self._notify_subscribers(msg)
-
-        return ComsDriverReadLooop(read, daemon=True)
+        return ComsDriverReadLooop(
+            lambda: self._read(), lambda m: self._notify_subscribers(m), daemon=True
+        )
 
     @property
     def is_reading(self) -> bool:
@@ -75,10 +70,10 @@ class BaseComsDriver(ABC):
         try:
             self._write(m)
             return True
-        except Exception:
+        except Exception as e:
             if suppress_errors:
                 return False
-            raise
+            raise ComsDriverWriteError(f"Failed to send message '{m}'") from e
 
     @abstractmethod
     def _write(self, m: ParsableComType) -> None:
@@ -104,18 +99,53 @@ class BaseComsDriver(ABC):
 class ComsDriverReadLooop(Thread):
     def __init__(
         self,
-        read: Callable[[], Any],
+        get_msg: Callable[[], ComsMessage],
+        on_msg: Callable[[ComsMessage], Any],
         name: Optional[str] = None,
         daemon: Optional[bool] = None,
     ) -> None:
         super().__init__(name=name, daemon=daemon)
         self._stop_event = Event()
-        self.read = read
+        self._get_msg = get_msg
+        self._on_msg = on_msg
+        self._mngr = mp.Manager()
+
+    # def run(self) -> None:
+    #     while not self._stop_event.is_set():
+    #         self.read()
+    #         self._stop_event.wait(1)
 
     def run(self) -> None:
+        proc, shared = self._spawn_get_msg_proc()
+        proc.start()
+
         while not self._stop_event.is_set():
-            self.read()
-            self._stop_event.wait(1)
+            if not proc.is_alive():
+                break
+            proc.join(timeout=1)
+
+        if proc.is_alive():
+            proc.terminate()
+
+    def _spawn_get_msg_proc(self) -> Tuple[mp.Process, Any]:
+        shared = None  # TODO: Make this something shared
+
+        def get_msg(s):
+            self._get_msg()
+            # TODO: Do something with s
+
+        return mp.Process(target=get_msg, args=(shared,), daemon=True), shared
+
+    # TODO: This is just playing around may be bad
+    # def run
+    # while not stopped:
+    #   if no process
+    #       make new proces with blocking input
+    #   if proces joined:
+    #       if err out handle it
+    #       otherwise take recieved ComsMessage and notify subscribers, none proccess
+    #   else:
+    #       wait for stop event for a sec
 
     def stop(self, timeout: Optional[float] = None) -> None:
         self._stop_event.set()
