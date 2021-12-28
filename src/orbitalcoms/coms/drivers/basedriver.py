@@ -68,7 +68,7 @@ class BaseComsDriver(ABC):
         return message
 
     @abstractmethod
-    def _read(self) -> ComsMessage:  # pragma: no cover
+    def _read(self) -> ComsMessage:
         ...
 
     def write(self, m: ParsableComType, suppress_errors: bool = False) -> bool:
@@ -81,7 +81,7 @@ class BaseComsDriver(ABC):
             raise
 
     @abstractmethod
-    def _write(self, m: ParsableComType) -> None:  # pragma: no cover
+    def _write(self, m: ParsableComType) -> None:
         ...
 
     def register_subscriber(self, sub: ComsSubscriberLike) -> None:
