@@ -1,6 +1,10 @@
 PY = python3
 PIP = pip3
 
+ifndef COV_FILE
+export COV_FILE="${PWD}/tests/test_configs/cov/coverage.cfg"
+endif
+
 
 .PHONY: all
 all:
@@ -44,12 +48,12 @@ test:
 
 .PHONY: test-cov
 test-cov:
-	@${PY} -m pytest --cov=./src
+	@${PY} -m pytest --cov-config=${COV_FILE} --cov=./src
 
 
 .PHONY: test-cov-html
 test-cov-html:
-	@${PY} -m pytest --cov=./src --cov-report html
+	@${PY} -m pytest --cov-config=${COV_FILE} --cov=./src --cov-report html 
 
 
 .PHONY: type
