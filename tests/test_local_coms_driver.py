@@ -16,7 +16,7 @@ def coms_drivers():
     a.end_read_loop()
     b.end_read_loop()
 
-@pytest.mark.skip(reason="Not implimented")
+
 @pytest.mark.parametrize(
     "msg_a, msg_b",
     [
@@ -65,7 +65,7 @@ def test_write_read(
     a.start_read_loop()
     b.start_read_loop()
 
-    # assert threading.active_count() == 3
+    assert threading.active_count() == 3
     assert a.is_reading
     assert b.is_reading
 

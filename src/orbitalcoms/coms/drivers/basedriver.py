@@ -114,11 +114,6 @@ class ComsDriverReadLooop(Thread):
         self._on_msg = on_msg
         self._mngr = mp.Manager()
 
-    # def run(self) -> None:
-    #     while not self._stop_event.is_set():
-    #         self.read()
-    #         self._stop_event.wait(1)
-
     def run(self) -> None:
         proc, shared = self._spawn_get_msg_proc()
         proc.start()
@@ -152,17 +147,6 @@ class ComsDriverReadLooop(Thread):
                 s["error"] = e
 
         return mp.Process(target=get_msg, args=(shared,), daemon=True), shared
-
-    # TODO: This is just playing around may be bad
-    # def run
-    # while not stopped:
-    #   if no process
-    #       make new proces with blocking input
-    #   if proces joined:
-    #       if err out handle it
-    #       otherwise take recieved ComsMessage and notify subscribers, none proccess
-    #   else:
-    #       wait for stop event for a sec
 
     def stop(self, timeout: Optional[float] = None) -> None:
         self._stop_event.set()

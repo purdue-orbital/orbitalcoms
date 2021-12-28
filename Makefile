@@ -9,7 +9,7 @@ all:
 
 .PHONY: clean
 clean:
-	@rm -rf dist .mypy_cache .pytest_cache htmlcov .coverage
+	@rm -rf dist .mypy_cache .pytest_cache htmlcov .coverage .coverage.*
 	@find . | grep -E "(__pycache__|\.pyc|\.pyo$$)" | xargs rm -rf
 
 

@@ -1,8 +1,7 @@
 from __future__ import annotations
 
-from time import sleep
-from typing import List, Set, Tuple
 import multiprocessing as mp
+from typing import List, Set, Tuple
 
 from ..messages import ComsMessage, ParsableComType, construct_message
 from .basedriver import BaseComsDriver

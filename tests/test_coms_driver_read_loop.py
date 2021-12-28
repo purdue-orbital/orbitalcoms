@@ -3,7 +3,10 @@ from orbitalcoms.coms.drivers.basedriver import ComsDriverReadLooop
 
 
 def test_start_stop_read_loop():
-    rl = ComsDriverReadLooop(read=lambda: sleep(1), daemon=True)
+    # Not gonna pass type checking, just make sure it wakes up and dies
+    rl = ComsDriverReadLooop(
+        get_msg=lambda: sleep(1), on_msg=lambda: sleep(1), daemon=True
+    )
     rl.start()
     sleep(2)
     assert rl.is_alive()
