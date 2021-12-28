@@ -1,9 +1,9 @@
 from __future__ import annotations
 
+import multiprocessing as mp
 from abc import ABC, abstractmethod
 from threading import Condition, Event, Thread
-import multiprocessing as mp
-from typing import TYPE_CHECKING, Any, Callable, Optional, Set, Tuple
+from typing import TYPE_CHECKING, Any, Callable, Optional, Set, Tuple, TypedDict, cast
 
 from ..errors import ComsDriverReadError, ComsDriverWriteError
 from ..subscribers import OneTimeComsSubscription
@@ -30,10 +30,10 @@ class BaseComsDriver(ABC):
             self._read_loop.join()
         return self._read_loop
 
-    def end_read_loop(self) -> None:
+    def end_read_loop(self, timeout: Optional[float] = None) -> None:
         if self._read_loop:
             if self._read_loop.is_alive():
-                self._read_loop.stop()
+                self._read_loop.stop(timeout=timeout)
             self._read_loop = None
 
     def _spawn_read_loop_thread(self) -> ComsDriverReadLooop:
@@ -97,6 +97,10 @@ class BaseComsDriver(ABC):
 
 
 class ComsDriverReadLooop(Thread):
+    class GetMsgResults(TypedDict):
+        result: Optional[ComsMessage]
+        error: Optional[Exception]
+
     def __init__(
         self,
         get_msg: Callable[[], ComsMessage],
@@ -121,18 +125,31 @@ class ComsDriverReadLooop(Thread):
 
         while not self._stop_event.is_set():
             if not proc.is_alive():
-                break
+                if shared["result"]:
+                    self._on_msg(shared["result"])
+                else:
+                    # TODO: Add logging
+                    ...
+                proc, shared = self._spawn_get_msg_proc()
+                proc.start()
             proc.join(timeout=1)
 
         if proc.is_alive():
             proc.terminate()
 
-    def _spawn_get_msg_proc(self) -> Tuple[mp.Process, Any]:
-        shared = None  # TODO: Make this something shared
+    def _spawn_get_msg_proc(
+        self,
+    ) -> Tuple[mp.Process, ComsDriverReadLooop.GetMsgResults]:
+        shared = cast(
+            ComsDriverReadLooop.GetMsgResults,
+            self._mngr.dict({"result": None, "error": None}),
+        )
 
-        def get_msg(s):
-            self._get_msg()
-            # TODO: Do something with s
+        def get_msg(s: ComsDriverReadLooop.GetMsgResults) -> None:
+            try:
+                s["result"] = self._get_msg()
+            except Exception as e:
+                s["error"] = e
 
         return mp.Process(target=get_msg, args=(shared,), daemon=True), shared
 
