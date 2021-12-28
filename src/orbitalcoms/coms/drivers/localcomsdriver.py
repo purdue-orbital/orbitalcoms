@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from time import sleep
 from typing import List, Set, Tuple
+import multiprocessing as mp
 
 from ..messages import ComsMessage, ParsableComType, construct_message
 from .basedriver import BaseComsDriver
@@ -14,8 +15,10 @@ class LocalComsDriver(BaseComsDriver):
 
     def __init__(self) -> None:
         super().__init__()
-        self._messages: List[str] = []
         self._listening: Set[LocalComsDriver] = set()
+
+        # needs to be shared bc read is in different proc than write
+        self._messages: List[str] = mp.Manager().list()
 
     def _read(self) -> ComsMessage:
         while True:
