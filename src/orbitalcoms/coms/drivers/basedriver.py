@@ -7,7 +7,7 @@ from typing import TYPE_CHECKING, Any, Callable, Optional, Set
 from ..errors import ComsDriverReadError
 from ..subscribers import OneTimeComsSubscription
 
-if TYPE_CHECKING:  # pragma: no cover
+if TYPE_CHECKING:
     from ..messages import ComsMessage, ParsableComType
     from ..subscribers import ComsSubscriberLike
 
