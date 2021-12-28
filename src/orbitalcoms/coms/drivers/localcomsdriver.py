@@ -14,18 +14,17 @@ class LocalComsDriver(BaseComsDriver):
 
     def __init__(self) -> None:
         super().__init__()
-        self._messages: List[ComsMessage] = []
+        self._messages: List[str] = []
         self._listening: Set[LocalComsDriver] = set()
 
     def _read(self) -> ComsMessage:
         while True:
             if self._messages:
-                return self._messages.pop(0)
-            sleep(1)
+                return construct_message(self._messages.pop(0))
 
     def _write(self, m: ParsableComType) -> None:
         for li in self._listening:
-            li._messages.append(construct_message(m))
+            li._messages.append(construct_message(m).as_str)
 
     def listen_to(self, com: LocalComsDriver) -> None:
         com._listening.add(self)
