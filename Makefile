@@ -12,9 +12,14 @@ all:
 
 
 .PHONY: clean
-clean:
-	@rm -rf dist .mypy_cache .pytest_cache htmlcov .coverage .coverage.*
+clean: clean-cov
+	@rm -rf dist .mypy_cache .pytest_cache htmlcov
 	@find . | grep -E "(__pycache__|\.pyc|\.pyo$$)" | xargs rm -rf
+
+
+.PHONY: clean-cov
+clean-cov:
+	@rm -f .coverage .coverage.*
 
 
 .PHONY: dev
@@ -53,7 +58,7 @@ test-cov:
 
 .PHONY: test-cov-html
 test-cov-html:
-	@${PY} -m pytest --cov-config=${COV_FILE} --cov=./src --cov-report html 
+	@${PY} -m pytest --cov-config=${COV_FILE} --cov=./src --cov-report html
 
 
 .PHONY: type
@@ -65,7 +70,8 @@ type:
 help:
 	@echo "COMMANDS:"
 	@echo "  all: ------------ Build a distributible form of the package"
-	@echo "  clean: ---------- Remove builds, python caches, and mypy caches"
+	@echo "  clean: ---------- Remove builds, python caches, and mypy caches, pytest caches"
+	@echo "  clean-cov: ------ Remove coverage binaries"
 	@echo "  dev: ------------ Create links to package for development changes"
 	@echo "  install: -------- Build and install package"
 	@echo "  style: ---------- Format the code base to meet pep8 standards"
