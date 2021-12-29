@@ -55,7 +55,7 @@ def test_coms_driver_connects(port, msg_a, msg_b):
     host_th = th.Thread(target=_host, daemon=True)
     client_th = th.Thread(target=_client, daemon=True)
     host_th.start()
-    time.sleep(0.2)
+    time.sleep(0.75)
     client_th.start()
     client_th.join()
     host_th.join()
@@ -72,4 +72,4 @@ def test_coms_driver_connects(port, msg_a, msg_b):
 
 def test_error_when_cannot_connect():
     with pytest.raises(ConnectionRefusedError):
-        SocketComsDriver.connect_to("127.0.1.1", 5000)
+        SocketComsDriver.connect_to("127.0.1.1", 5004)
