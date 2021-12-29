@@ -18,7 +18,7 @@ class SocketComsDriver(BaseComsDriver):
     def accept_connection_at(cls, host: str = "", port: int = 5000) -> SocketComsDriver:
         with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as server:
             server.bind((host, port))
-            server.listen(1)
+            server.listen(0)
             conn, _ = server.accept()
         return cls(conn)
 
