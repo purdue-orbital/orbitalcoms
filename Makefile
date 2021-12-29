@@ -19,7 +19,7 @@ clean: clean-cov
 
 .PHONY: clean-cov
 clean-cov:
-	@rm -f .coverage .coverage.*
+	@rm -f .coverage*
 
 
 .PHONY: dev
@@ -54,11 +54,13 @@ test:
 .PHONY: test-cov
 test-cov:
 	@${PY} -m pytest --cov-config=${COV_FILE} --cov=./src
+	@rm -f .coverage*
 
 
 .PHONY: test-cov-html
 test-cov-html:
 	@${PY} -m pytest --cov-config=${COV_FILE} --cov=./src --cov-report html
+	@rm -f .coverage*
 
 
 .PHONY: type
