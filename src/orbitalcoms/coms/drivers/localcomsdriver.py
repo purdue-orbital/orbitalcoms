@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import multiprocessing as mp
+import time
 from typing import List, Set, Tuple
 
 from ..messages import ComsMessage, ParsableComType, construct_message
@@ -23,6 +24,7 @@ class LocalComsDriver(BaseComsDriver):
         while True:
             if self._messages:
                 return construct_message(self._messages.pop(0))
+            time.sleep(0.2)
 
     def _write(self, m: ParsableComType) -> None:
         for li in self._listening:
