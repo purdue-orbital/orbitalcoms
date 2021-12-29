@@ -1,7 +1,9 @@
 import socket
-import pytest
 import threading as th
 import time
+
+import pytest
+
 from orbitalcoms.coms.drivers.socketcomsdriver import SocketComsDriver
 from orbitalcoms.coms.messages.message import ComsMessage
 
@@ -27,8 +29,8 @@ from orbitalcoms.coms.messages.message import ComsMessage
     ],
 )
 def test_coms_driver_connects(port, msg_a, msg_b):
-    host_read = ComsMessage(0, 0, 0, 0)
-    client_read = ComsMessage(0, 0, 0, 0)
+    host_read = None
+    client_read = None
 
     def _host():
         nonlocal host_read

@@ -1,6 +1,7 @@
 import threading
 import time
 from typing import Tuple
+
 import pytest
 
 from orbitalcoms.coms.drivers.localcomsdriver import LocalComsDriver

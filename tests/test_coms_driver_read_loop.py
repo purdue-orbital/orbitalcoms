@@ -24,5 +24,5 @@ def test_ends_on_stop_in_short_time():
     time.sleep(1)
     rl.stop()
     end = time.time()
-    assert end - start < 5 # must end in less than 5 sec
+    assert end - start < 5  # must end in less than 5 sec
     assert not rl.is_alive()

@@ -1,4 +1,5 @@
 import pytest
+
 from orbitalcoms.coms.errors.errors import ComsMessageParseError
 from orbitalcoms.coms.messages.message import ComsMessage, construct_message
 

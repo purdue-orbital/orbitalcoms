@@ -1,5 +1,6 @@
-import pytest
 import dataclasses
+
+import pytest
 
 from orbitalcoms.coms.messages.message import ComsMessage
 
