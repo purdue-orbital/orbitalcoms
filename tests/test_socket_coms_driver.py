@@ -14,17 +14,17 @@ from orbitalcoms.coms.messages.message import ComsMessage
         pytest.param(
             ComsMessage(ABORT=0, ARMED=0, QDM=1, STAB=0, LAUNCH=0),
             ComsMessage(ABORT=1, ARMED=1, QDM=1, STAB=0, LAUNCH=0),
-            id="ComsMessages"
+            id="ComsMessages",
         ),
         pytest.param(
             '{"ABORT": 0, "ARMED": 0, "QDM": 1, "STAB": 0, "LAUNCH": 0}',
             '{"ABORT": 1, "ARMED": 1, "QDM": 1, "STAB": 0, "LAUNCH": 0}',
-            id="strings"
+            id="strings",
         ),
         pytest.param(
             {"ABORT": 0, "ARMED": 0, "QDM": 1, "STAB": 0, "LAUNCH": 0},
             {"ABORT": 1, "ARMED": 1, "QDM": 1, "STAB": 0, "LAUNCH": 0},
-            id="dictionaries"
+            id="dictionaries",
         ),
     ],
 )

@@ -115,7 +115,7 @@ def test_send_invailid(coms_drivers):
 
 def test_send_invalid_ignore_err(coms_drivers):
     a, _ = coms_drivers
-    assert a.write("Invalid", suppress_errors=True) == False
+    assert a.write("Invalid", suppress_errors=True) is False
 
 
 def test_dont_start_multiple_read_loops(coms_drivers):
