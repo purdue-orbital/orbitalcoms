@@ -18,6 +18,16 @@ def gs_and_loc() -> Tuple[GroundStation, LocalComsDriver]:
     b.end_read_loop()
 
 
+def test_all_fields_start_false(gs_and_loc: Tuple[GroundStation, LocalComsDriver]):
+    gs, _ = gs_and_loc
+    assert gs.abort is False
+    assert gs.qdm is False
+    assert gs.stab is False
+    assert gs.launch is False
+    assert gs.armed is False
+    assert gs.data is None
+
+
 def test_bind_queue(gs_and_loc: Tuple[GroundStation, LocalComsDriver]):
     gs, loc = gs_and_loc
     gs_read: List[ComsMessage] = []
