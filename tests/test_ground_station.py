@@ -118,3 +118,12 @@ def test_data_retains_unupdated_keys(gs_and_loc: Tuple[GroundStation, LocalComsD
     assert gs.data["key1"] == 1
     assert gs.data["key2"] == 4
     assert gs.data["key3"] == ":)"
+
+
+@pytest.mark.skip(reason="Feature not implimented")
+def test_station_does_not_unarm(gs_and_loc: Tuple[GroundStation, LocalComsDriver]):
+    gs, _ = gs_and_loc
+
+    with pytest.raises(Exception):  # TODO: tighter exception needed
+        gs.send(ComsMessage(0, 0, 0, 0, ARMED=1, DATA={"key1": 1}))
+        gs.send(ComsMessage(0, 0, 0, 0, ARMED=0, DATA={"key2": 2}))

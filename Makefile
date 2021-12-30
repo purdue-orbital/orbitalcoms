@@ -34,6 +34,7 @@ install:
 
 .PHONY: style
 style:
+	@echo "================================= SRC ================================"
 	@echo "Sorting Imports:"
 	@${PY} -m isort ./src
 	@echo "Done Sorting Imports"
@@ -44,6 +45,27 @@ style:
 	@${PY} -m flake8 ./src && \
 		([ $$? -eq 0 ] && echo "Styling Complete!! 🎉🎉") || \
 		echo "❌^^^ Please address the above styling concerns ^^^❌"
+	@echo "====================================================================="
+
+
+.PHONY: style-tests
+style-tests:
+	@echo "================================ TEST ==============================="
+	@echo "Sorting Imports:"
+	@${PY} -m isort ./tests
+	@echo "Done Sorting Imports"
+	@echo "Styling"
+	@${PY} -m black ./tests
+	@echo "Done Styling"
+	@echo "Checking Code Format"
+	@${PY} -m flake8 ./tests && \
+		([ $$? -eq 0 ] && echo "Test Styling Complete!! 🎉🎉") || \
+		echo "🔎^^^ Here are some styling suggestions ^^^🔎"
+	@echo "====================================================================="
+
+
+.PHONY: style-all
+style-all: style style-tests
 
 
 .PHONY: test
@@ -77,6 +99,8 @@ help:
 	@echo "  dev: ------------ Create links to package for development changes"
 	@echo "  install: -------- Build and install package"
 	@echo "  style: ---------- Format the code base to meet pep8 standards"
+	@echo "  style-tests: ---- Format the test suite to meet pep8 standards"
+	@echo "  style-all: ------ Run the two previous commands"
 	@echo "  test: ----------- Run tests"
 	@echo "  test-cov: ------- Run tests with coverage report"
 	@echo "  test-cov-html: -- Run tests with coverage report as html"
