@@ -9,31 +9,40 @@ from orbitalcoms.coms.messages.message import ComsMessage
 
 
 @pytest.mark.parametrize(
-    "port, msg_a, msg_b",
+    "msg_a, msg_b",
     [
         (
-            5000,
             ComsMessage(ABORT=0, ARMED=0, QDM=1, STAB=0, LAUNCH=0),
             ComsMessage(ABORT=1, ARMED=1, QDM=1, STAB=0, LAUNCH=0),
         ),
         (
-            5001,
             '{"ABORT": 0, "ARMED": 0, "QDM": 1, "STAB": 0, "LAUNCH": 0}',
             '{"ABORT": 1, "ARMED": 1, "QDM": 1, "STAB": 0, "LAUNCH": 0}',
         ),
         (
-            5002,
             {"ABORT": 0, "ARMED": 0, "QDM": 1, "STAB": 0, "LAUNCH": 0},
             {"ABORT": 1, "ARMED": 1, "QDM": 1, "STAB": 0, "LAUNCH": 0},
         ),
     ],
 )
-def test_coms_driver_connects(port, msg_a, msg_b):
+def test_coms_driver_connects(msg_a, msg_b):
     host_read = None
     client_read = None
 
+    cv = th.Condition()
+    port = -1
+
     def _host():
-        nonlocal host_read
+        nonlocal host_read, port
+        # coms = SocketComsDriver.accept_connection_at("127.0.1.1", 0)
+
+        with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as server:
+            server.bind(("127.0.1.1", 0))
+            port = server.getsockname()[1]
+
+        with cv:
+            cv.notify()
+
         coms = SocketComsDriver.accept_connection_at("127.0.1.1", port)
         coms.start_read_loop()
         coms.write(msg_a)
@@ -54,9 +63,14 @@ def test_coms_driver_connects(port, msg_a, msg_b):
 
     host_th = th.Thread(target=_host, daemon=True)
     client_th = th.Thread(target=_client, daemon=True)
+
     host_th.start()
-    time.sleep(0.75)
+    with cv:
+        cv.wait_for(lambda: port > 0)
+    time.sleep(0.2)
+
     client_th.start()
+    time.sleep(0.2)
     client_th.join()
     host_th.join()
 
@@ -71,5 +85,6 @@ def test_coms_driver_connects(port, msg_a, msg_b):
 
 
 def test_error_when_cannot_connect():
+    # this test will fail if something is running on 5000
     with pytest.raises(ConnectionRefusedError):
-        SocketComsDriver.connect_to("127.0.1.1", 5004)
+        SocketComsDriver.connect_to("127.0.1.1", 5000)
