@@ -41,4 +41,4 @@ def create_serial_ground_station(port: str, baudrate: int) -> GroundStation:
     """Convinence function for creating a Ground Station
     that communicates using a serial port
     """
-    return LaunchStation(SerialComsDriver(port, baudrate))  # pragma: no cover
+    return GroundStation(SerialComsDriver(port, baudrate))  # pragma: no cover
