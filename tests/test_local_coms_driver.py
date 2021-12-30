@@ -21,19 +21,21 @@ def coms_drivers():
 @pytest.mark.parametrize(
     "msg_a, msg_b",
     [
-        (
+        pytest.param(
             ComsMessage(
                 ABORT=1, STAB=0, LAUNCH=0, QDM=1, ARMED=1, DATA={"msg": "msg #1"}
             ),
             ComsMessage(
                 ABORT=0, STAB=1, LAUNCH=1, QDM=0, ARMED=0, DATA={"msg": "msg #2"}
             ),
+            id="ComsMessages",
         ),
-        (
+        pytest.param(
             '{"ABORT": 1, "QDM": 1, "STAB": 0, "LAUNCH": 0, "ARMED": 1, "DATA": {"msg": "msg #1"}}',
             '{"ABORT": 0, "QDM": 0, "STAB": 1, "LAUNCH": 1, "ARMED": 0, "DATA": {"msg": "msg #2"}}',
+            id="strings",
         ),
-        (
+        pytest.param(
             {
                 "ABORT": 1,
                 "QDM": 1,
@@ -50,6 +52,7 @@ def coms_drivers():
                 "ARMED": 0,
                 "DATA": {"msg": "msg #2"},
             },
+            id="dictionaries",
         ),
     ],
 )

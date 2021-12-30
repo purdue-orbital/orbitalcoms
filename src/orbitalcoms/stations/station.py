@@ -25,7 +25,7 @@ class Station(ABC):
         def recieve(message: ComsMessage) -> None:
             self._on_receive(message)
             self._last_recieved = message
-            if self.queue:
+            if self.queue is not None:
                 self.queue.append(message)
 
         self._coms.register_subscriber(ComsSubscription(recieve))
@@ -85,10 +85,12 @@ class Station(ABC):
             return True
         return False
 
+    def bind_queue(self, queue: Queueable) -> None:
+        """Alias for bindQueue"""
+        return self.bindQueue(queue)
+
     def bindQueue(self, queue: Queueable) -> None:
-        """
-        Supply a queue reference for data placement. See recvTest.py for example usage.
-        """
+        """Supply a queue reference for data placement"""
         self.queue = queue
 
     def getLaunchFlag(self) -> bool:

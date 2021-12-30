@@ -48,18 +48,18 @@ style:
 
 .PHONY: test
 test:
-	@${PY} -m pytest
+	@${PY} -m pytest -v
 
 
 .PHONY: test-cov
 test-cov:
-	@${PY} -m pytest --cov-config=${COV_FILE} --cov=./src
+	@${PY} -m pytest -v --cov-config=${COV_FILE} --cov=./src
 	@rm -f .coverage*
 
 
 .PHONY: test-cov-html
 test-cov-html:
-	@${PY} -m pytest --cov-config=${COV_FILE} --cov=./src --cov-report html
+	@${PY} -m pytest -v --cov-config=${COV_FILE} --cov=./src --cov-report html
 	@rm -f .coverage*
 
 

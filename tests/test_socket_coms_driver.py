@@ -11,17 +11,20 @@ from orbitalcoms.coms.messages.message import ComsMessage
 @pytest.mark.parametrize(
     "msg_a, msg_b",
     [
-        (
+        pytest.param(
             ComsMessage(ABORT=0, ARMED=0, QDM=1, STAB=0, LAUNCH=0),
             ComsMessage(ABORT=1, ARMED=1, QDM=1, STAB=0, LAUNCH=0),
+            id="ComsMessages"
         ),
-        (
+        pytest.param(
             '{"ABORT": 0, "ARMED": 0, "QDM": 1, "STAB": 0, "LAUNCH": 0}',
             '{"ABORT": 1, "ARMED": 1, "QDM": 1, "STAB": 0, "LAUNCH": 0}',
+            id="strings"
         ),
-        (
+        pytest.param(
             {"ABORT": 0, "ARMED": 0, "QDM": 1, "STAB": 0, "LAUNCH": 0},
             {"ABORT": 1, "ARMED": 1, "QDM": 1, "STAB": 0, "LAUNCH": 0},
+            id="dictionaries"
         ),
     ],
 )
