@@ -1,6 +1,6 @@
 import serial
 
-from ..messages import ComsMessage, ParsableComType, construct_message
+from ..messages import ComsMessage, construct_message
 from .basedriver import BaseComsDriver
 
 
@@ -16,7 +16,7 @@ class SerialComsDriver(BaseComsDriver):
             c = self.ser.read().decode(errors="ignore")
             if c == "&":
                 try:
-                    return ComsMessage.from_string(msg)
+                    return construct_message(msg)
                 except Exception:
                     # TODO: Replace error raise
                     print(f"Invalid Messge Recieved: {msg}")
@@ -25,8 +25,7 @@ class SerialComsDriver(BaseComsDriver):
             else:
                 msg += c
 
-    def _write(self, msg: ParsableComType) -> None:
-        m = construct_message(msg)
+    def _write(self, m: ComsMessage) -> None:
         self.ser.write(f"{m.as_str}&".encode())
         self.ser.flush()
 

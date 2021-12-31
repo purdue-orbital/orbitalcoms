@@ -6,6 +6,7 @@ from threading import Condition, Event, Thread
 from typing import TYPE_CHECKING, Any, Callable, Optional, Set, Tuple, TypedDict, cast
 
 from ..errors import ComsDriverReadError, ComsDriverWriteError
+from ..messages import construct_message
 from ..subscribers import OneTimeComsSubscription
 
 if TYPE_CHECKING:
@@ -68,7 +69,7 @@ class BaseComsDriver(ABC):
 
     def write(self, m: ParsableComType, suppress_errors: bool = False) -> bool:
         try:
-            self._write(m)
+            self._write(construct_message(m))
             return True
         except Exception as e:
             if suppress_errors:
@@ -76,7 +77,7 @@ class BaseComsDriver(ABC):
             raise ComsDriverWriteError(f"Failed to send message '{m}'") from e
 
     @abstractmethod
-    def _write(self, m: ParsableComType) -> None:
+    def _write(self, m: ComsMessage) -> None:
         ...
 
     def register_subscriber(self, sub: ComsSubscriberLike) -> None:

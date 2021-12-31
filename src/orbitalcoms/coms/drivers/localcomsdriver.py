@@ -4,7 +4,7 @@ import multiprocessing as mp
 import time
 from typing import List, Set, Tuple
 
-from ..messages import ComsMessage, ParsableComType, construct_message
+from ..messages import ComsMessage, construct_message
 from .basedriver import BaseComsDriver
 
 
@@ -26,9 +26,9 @@ class LocalComsDriver(BaseComsDriver):
                 return construct_message(self._messages.pop(0))
             time.sleep(0.2)
 
-    def _write(self, m: ParsableComType) -> None:
+    def _write(self, m: ComsMessage) -> None:
         for li in self._listening:
-            li._messages.append(construct_message(m).as_str)
+            li._messages.append(m.as_str)
 
     def listen_to(self, com: LocalComsDriver) -> None:
         com._listening.add(self)

@@ -3,7 +3,7 @@ from __future__ import annotations
 import socket
 
 from ..errors import ComsDriverReadError, ComsDriverWriteError
-from ..messages import ComsMessage, ParsableComType, construct_message
+from ..messages import ComsMessage, construct_message
 from .basedriver import BaseComsDriver
 
 
@@ -34,12 +34,12 @@ class SocketComsDriver(BaseComsDriver):
             raise ComsDriverReadError(f"Invalid header recieved: '{head}'")
         try:
             msg = self._sock.recv(int(head)).decode()
-            return ComsMessage.from_string(msg)
+            return construct_message(msg)
         except Exception as e:
             raise ComsDriverReadError(f"Invalid message recieved: '{msg}'") from e
 
-    def _write(self, m: ParsableComType) -> None:
-        msg = construct_message(m).as_str.encode()
+    def _write(self, m: ComsMessage) -> None:
+        msg = m.as_str.encode()
         header = str(len(msg)).encode()
         if len(header) > self.__HEADER:
             raise ComsDriverWriteError("Message too long to generate header")
