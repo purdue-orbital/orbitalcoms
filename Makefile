@@ -48,24 +48,24 @@ style:
 	@echo "====================================================================="
 
 
-.PHONY: style-tests
-style-tests:
-	@echo "================================ TEST ==============================="
+.PHONY: style-extras
+style-extras:
+	@echo "=============================== EXTRA ==============================="
 	@echo "Sorting Imports:"
-	@${PY} -m isort ./tests
+	@${PY} -m isort ./tests ./mocks
 	@echo "Done Sorting Imports"
 	@echo "Styling"
-	@${PY} -m black ./tests
+	@${PY} -m black ./tests ./mocks
 	@echo "Done Styling"
 	@echo "Checking Code Format"
 	@${PY} -m flake8 ./tests && \
-		([ $$? -eq 0 ] && echo "Test Styling Complete!! 🎉🎉") || \
+		([ $$? -eq 0 ] && echo "Extra Styling Complete!! 🎉🎉") || \
 		echo "🔎^^^ Here are some styling suggestions ^^^🔎"
 	@echo "====================================================================="
 
 
 .PHONY: style-all
-style-all: style style-tests
+style-all: style style-extras
 
 
 .PHONY: test
@@ -99,7 +99,7 @@ help:
 	@echo "  dev: ------------ Create links to package for development changes"
 	@echo "  install: -------- Build and install package"
 	@echo "  style: ---------- Format the code base to meet pep8 standards"
-	@echo "  style-tests: ---- Format the test suite to meet pep8 standards"
+	@echo "  style-tests: ---- Format the test suite and mocks to meet pep8 standards"
 	@echo "  style-all: ------ Run the two previous commands"
 	@echo "  test: ----------- Run tests"
 	@echo "  test-cov: ------- Run tests with coverage report"
