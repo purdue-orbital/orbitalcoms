@@ -2,7 +2,7 @@ import argparse
 from typing import TYPE_CHECKING, Protocol, cast
 
 import orbitalcoms._app.tkgui as tkgui
-from orbitalcoms import GroundStation, SocketComsDriver, SerialComsDriver
+from orbitalcoms import GroundStation, SerialComsDriver, SocketComsDriver
 
 if TYPE_CHECKING:
     from orbitalcoms import BaseComsDriver
