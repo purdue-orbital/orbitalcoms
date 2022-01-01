@@ -14,18 +14,22 @@ if TYPE_CHECKING:
 
 
 class GroundStationFrame(tk.Frame):
+    class FrameUpdateQueue:
+        def __init__(self, gui: GroundStationFrame) -> None:
+            self._gui = gui
+
+        def append(self, _: Any):
+            self._gui.update_disp()
+
     def __init__(self, gs: GroundStation, *args: Any, **kwargs: Any) -> None:
         super().__init__(*args, **kwargs)
         self._gs = gs
+        self._gs.bind_queue(GroundStationFrame.FrameUpdateQueue(self))
         self.grid(column=0, row=0, sticky="nsew")
         self.master.columnconfigure(index=0, weight=1)
         self.master.rowconfigure(index=0, weight=1)
 
-        self.columnconfigure(
-            index=0,
-            weight=1,
-            uniform="1",
-        )
+        self.columnconfigure(index=0, weight=1, uniform="1")
         self.rowconfigure(index=0, weight=1)
         self.rowconfigure(index=1, weight=1)
         self.rowconfigure(index=2, weight=1)
@@ -110,19 +114,9 @@ class GroundStationFrame(tk.Frame):
 
 def run_app(gs: GroundStation) -> None:
     root = tk.Tk()
+    root.title("Development GS GUI")
     width = 800
     height = 600
     root.geometry(f"{width}x{height}")
     gs_gui = GroundStationFrame(gs, master=root)
     gs_gui.mainloop()
-
-
-if __name__ == "__main__":
-    from ..coms.drivers.localcomsdriver import LocalComsDriver
-    from ..stations.groundstation import GroundStation  # noqa: F811, will be removed
-    from ..stations.stationcreators import (  # noqa: F401, will be removed
-        create_socket_ground_station,
-    )
-
-    run_app(GroundStation(LocalComsDriver()))
-    # run_app(create_socket_ground_station())
