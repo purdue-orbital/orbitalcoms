@@ -91,7 +91,7 @@ class GroundStationFrame(tk.Frame):
             if title:
                 title = f"{title}:\n" + "=" * len(title) + "\n"
             if msg is None:
-                return title + "null"
+                return f"{title}null"
             return title + (
                 f"ARMED:  {msg.ARMED}\n"
                 f"ABORT:  {msg.ABORT}\n"
@@ -111,7 +111,7 @@ class GroundStationFrame(tk.Frame):
             data_str = json.dumps(self._gs.data, indent=2)
         except Exception:
             data_str = str(self._gs.data)
-        self.txt_data.insert(1.0, "DATA:\n====\n" + data_str)
+        self.txt_data.insert(1.0, f"DATA:\n====\n{data_str}")
 
 
 def run_app(gs: GroundStation) -> None:
