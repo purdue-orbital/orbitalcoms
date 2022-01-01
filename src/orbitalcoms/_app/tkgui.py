@@ -1,5 +1,7 @@
 """Ugly, inefficent, and all round grabage gui in tkinter
 for testing, mocking, and debuging purposes
+
+TODO: Replace with something better ASAP
 """
 from __future__ import annotations
 
@@ -18,7 +20,7 @@ class GroundStationFrame(tk.Frame):
         def __init__(self, gui: GroundStationFrame) -> None:
             self._gui = gui
 
-        def append(self, _: Any):
+        def append(self, _: Any) -> None:
             self._gui.update_disp()
 
     def __init__(self, gs: GroundStation, *args: Any, **kwargs: Any) -> None:
@@ -89,7 +91,7 @@ class GroundStationFrame(tk.Frame):
             if title:
                 title = f"{title}:\n" + "=" * len(title) + "\n"
             if msg is None:
-                return title + "None!"
+                return title + "null"
             return title + (
                 f"ARMED:  {msg.ARMED}\n"
                 f"ABORT:  {msg.ABORT}\n"
