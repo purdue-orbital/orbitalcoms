@@ -7,7 +7,7 @@ from __future__ import annotations
 
 import json
 import tkinter as tk
-from typing import TYPE_CHECKING, Any, Optional
+from typing import TYPE_CHECKING, Any
 
 from orbitalcoms.coms.messages.message import ComsMessage
 

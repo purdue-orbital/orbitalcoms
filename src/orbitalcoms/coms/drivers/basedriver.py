@@ -3,7 +3,7 @@ from __future__ import annotations
 import multiprocessing as mp
 from abc import ABC, abstractmethod
 from threading import Condition, Event, Thread
-from typing import TYPE_CHECKING, Any, Callable, Optional, Set, Tuple, TypedDict, cast
+from typing import TYPE_CHECKING, Any, Callable, Set, Tuple, TypedDict, cast
 
 from ..errors import ComsDriverReadError, ComsDriverWriteError
 from ..messages import construct_message
