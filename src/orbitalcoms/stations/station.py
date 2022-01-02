@@ -16,11 +16,11 @@ class Station(ABC):
     def __init__(self, coms: BaseComsDriver):
         self._coms = coms
 
-        self._last_sent: Optional[ComsMessage] = None
-        self._last_recieved: Optional[ComsMessage] = None
-        self._last_data: Optional[Dict[str, Any]] = None
+        self._last_sent: ComsMessage | None = None
+        self._last_recieved: ComsMessage | None = None
+        self._last_data: Dict[str, Any] | None = None
 
-        self.queue: Optional[Queueable] = None
+        self.queue: Queueable | None = None
 
         def recieve(message: ComsMessage) -> None:
             self._on_receive(message)
@@ -57,15 +57,15 @@ class Station(ABC):
         ...
 
     @property
-    def data(self) -> Optional[Dict[str, Any]]:
+    def data(self) -> Dict[str, Any] | None:
         return self._last_data
 
     @property
-    def last_sent(self) -> Optional[ComsMessage]:
+    def last_sent(self) -> ComsMessage | None:
         return self._last_sent
 
     @property
-    def last_recieved(self) -> Optional[ComsMessage]:
+    def last_recieved(self) -> ComsMessage | None:
         return self._last_recieved
 
     def _on_receive(self, new: ComsMessage) -> Any:

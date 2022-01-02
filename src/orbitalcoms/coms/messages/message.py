@@ -16,8 +16,8 @@ class ComsMessage:
     QDM: int
     STAB: int
     LAUNCH: int
-    ARMED: Optional[int] = None
-    DATA: Optional[Dict[str, Any]] = None
+    ARMED: int | None = None
+    DATA: Dict[str, Any] | None = None
 
     @classmethod
     def from_string(cls, s: str) -> ComsMessage:

@@ -87,7 +87,7 @@ class GroundStationFrame(tk.Frame):
         self.update_disp()
 
     def update_disp(self) -> None:
-        def coms_msg_txt_fomat(msg: Optional[ComsMessage], title: str = "") -> str:
+        def coms_msg_txt_fomat(msg: ComsMessage | None, title: str = "") -> str:
             if title:
                 title = f"{title}:\n" + "=" * len(title) + "\n"
             if msg is None:

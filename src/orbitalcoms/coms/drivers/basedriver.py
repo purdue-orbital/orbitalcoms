@@ -20,7 +20,7 @@ class BaseComsDriver(ABC):
     def __init__(self) -> None:
         super().__init__()
         self.subscrbers: Set[ComsSubscriberLike] = set()
-        self._read_loop: Optional[ComsDriverReadLooop] = None
+        self._read_loop: ComsDriverReadLooop | None = None
 
     def start_read_loop(self, block: bool = False) -> ComsDriverReadLooop:
         if self._read_loop:
@@ -31,7 +31,7 @@ class BaseComsDriver(ABC):
             self._read_loop.join()
         return self._read_loop
 
-    def end_read_loop(self, timeout: Optional[float] = None) -> None:
+    def end_read_loop(self, timeout: float | None = None) -> None:
         if self._read_loop:
             if self._read_loop.is_alive():
                 self._read_loop.stop(timeout=timeout)
@@ -48,7 +48,7 @@ class BaseComsDriver(ABC):
 
     def read(self) -> ComsMessage:
         cv = Condition()
-        message: Optional[ComsMessage] = None
+        message: ComsMessage | None = None
 
         def _get_next(m: ComsMessage) -> None:
             nonlocal message
@@ -99,15 +99,15 @@ class BaseComsDriver(ABC):
 
 class ComsDriverReadLooop(Thread):
     class GetMsgResults(TypedDict):
-        result: Optional[ComsMessage]
-        error: Optional[Exception]
+        result: ComsMessage | None
+        error: Exception | None
 
     def __init__(
         self,
         get_msg: Callable[[], ComsMessage],
         on_msg: Callable[[ComsMessage], Any],
-        name: Optional[str] = None,
-        daemon: Optional[bool] = None,
+        name: str | None = None,
+        daemon: bool | None = None,
     ) -> None:
         super().__init__(name=name, daemon=daemon)
         self._stop_event = Event()
@@ -149,6 +149,6 @@ class ComsDriverReadLooop(Thread):
 
         return mp.Process(target=get_msg, args=(shared,), daemon=True), shared
 
-    def stop(self, timeout: Optional[float] = None) -> None:
+    def stop(self, timeout: float | None = None) -> None:
         self._stop_event.set()
         self.join(timeout=timeout)
