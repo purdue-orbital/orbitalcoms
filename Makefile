@@ -13,7 +13,7 @@ all:
 
 .PHONY: clean
 clean: clean-cov
-	@rm -rf dist .mypy_cache .pytest_cache htmlcov
+	@rm -rf dist .mypy_cache .pytest_cache htmlcov .tox
 	@find . | grep -E "(__pycache__|\.pyc|\.pyo$$)" | xargs rm -rf
 
 
@@ -83,6 +83,11 @@ test-cov:
 test-cov-html:
 	@${PY} -m pytest -v --cov-config=${COV_FILE} --cov=./src --cov-report html
 	@rm -f .coverage*
+
+
+.PHONY: tox
+tox:
+	@${PY} -m tox
 
 
 .PHONY: type
