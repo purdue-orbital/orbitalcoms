@@ -5,7 +5,7 @@ from .basedriver import BaseComsDriver
 
 
 class SerialComsDriver(BaseComsDriver):
-    __ENCODING = 'utf-8'
+    __ENCODING = "utf-8"
 
     def __init__(self, port: str, baudrate: int) -> None:
         super().__init__()
@@ -18,13 +18,7 @@ class SerialComsDriver(BaseComsDriver):
         while True:
             c = self.ser.read().decode(encoding=self.__ENCODING, errors="ignore")
             if c == "&":
-                try:
-                    return construct_message(msg)
-                except Exception:
-                    # TODO: Replace error raise
-                    print(f"Invalid Messge Recieved: {msg}")
-                finally:
-                    msg = ""
+                return construct_message(msg)
             else:
                 msg += c
 
