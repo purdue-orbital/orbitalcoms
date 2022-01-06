@@ -46,7 +46,7 @@ class BaseComsDriver(ABC):
     def is_reading(self) -> bool:
         return self._read_loop is not None and self._read_loop.is_alive()
 
-    def read(self) -> ComsMessage:
+    def read(self, timeout: float | None = None) -> ComsMessage:
         cv = Condition()
         message: ComsMessage | None = None
 
@@ -58,7 +58,7 @@ class BaseComsDriver(ABC):
 
         self.register_subscriber(OneTimeComsSubscription(_get_next))
         with cv:
-            cv.wait_for(lambda: message is not None)
+            cv.wait_for(lambda: message is not None, timeout=timeout)
             if message is None:
                 raise ComsDriverReadError("Failed to read next message")
         return message
