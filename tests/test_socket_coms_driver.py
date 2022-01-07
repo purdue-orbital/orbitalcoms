@@ -28,7 +28,7 @@ from orbitalcoms.coms.messages.message import ComsMessage
         ),
     ],
 )
-def test_coms_driver_connects(msg_a, msg_b):
+def test_write_read(msg_a, msg_b):
     host_read = None
     client_read = None
 
