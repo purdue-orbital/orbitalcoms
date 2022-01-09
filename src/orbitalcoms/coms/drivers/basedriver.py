@@ -39,9 +39,7 @@ class BaseComsDriver(ABC):
             self._read_loop = None
 
     def _spawn_read_loop_thread(self) -> ComsDriverReadLooop:
-        return ComsDriverReadLooop(
-            lambda: self._read(), lambda m: self._notify_subscribers(m), daemon=True
-        )
+        return ComsDriverReadLooop(self, daemon=True)
 
     @property
     def is_reading(self) -> bool:
@@ -101,16 +99,13 @@ class BaseComsDriver(ABC):
 class ComsDriverReadLooop(Thread):
     def __init__(
         self,
-        get_msg: Callable[[], ComsMessage],
-        on_msg: Callable[[ComsMessage], Any],
+        coms: BaseComsDriver,
         name: str | None = None,
         daemon: bool | None = None,
     ) -> None:
         super().__init__(name=name, daemon=daemon)
         self._stop_event = Event()
-        self._get_msg = get_msg
-        self._on_msg = on_msg
-        self._mngr = mp.Manager()
+        self._coms = coms
 
     def run(self) -> None:
         proc, conn = self._spawn_get_msg_proc()
@@ -123,7 +118,7 @@ class ComsDriverReadLooop(Thread):
                     # TODO: Add logging
                     ...
                 else:
-                    self._on_msg(recived)
+                    self._coms._notify_subscribers(recived)
                 proc, conn = self._spawn_get_msg_proc()
                 proc.start()
             proc.join(timeout=1)
@@ -138,7 +133,7 @@ class ComsDriverReadLooop(Thread):
 
         def get_msg(conn: Connection) -> None:
             try:
-                conn.send(self._get_msg())
+                conn.send(self._coms._read())
             except Exception as e:
                 conn.send(e)
 
