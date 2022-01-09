@@ -2,8 +2,9 @@ from __future__ import annotations
 
 import multiprocessing as mp
 from abc import ABC, abstractmethod
+from multiprocessing.connection import Connection
 from threading import Condition, Event, Thread
-from typing import TYPE_CHECKING, Any, Callable, Set, Tuple, TypedDict, cast
+from typing import TYPE_CHECKING, Any, Callable, Set, Tuple
 
 from ..errors import ComsDriverReadError, ComsDriverWriteError
 from ..messages import construct_message
@@ -98,10 +99,6 @@ class BaseComsDriver(ABC):
 
 
 class ComsDriverReadLooop(Thread):
-    class GetMsgResults(TypedDict):
-        result: ComsMessage | None
-        error: Exception | None
-
     def __init__(
         self,
         get_msg: Callable[[], ComsMessage],
@@ -116,17 +113,18 @@ class ComsDriverReadLooop(Thread):
         self._mngr = mp.Manager()
 
     def run(self) -> None:
-        proc, shared = self._spawn_get_msg_proc()
+        proc, conn = self._spawn_get_msg_proc()
         proc.start()
 
         while not self._stop_event.is_set():
             if not proc.is_alive():
-                if shared["result"]:
-                    self._on_msg(shared["result"])
-                else:
+                recived = conn.recv()
+                if isinstance(recived, Exception):
                     # TODO: Add logging
                     ...
-                proc, shared = self._spawn_get_msg_proc()
+                else:
+                    self._on_msg(recived)
+                proc, conn = self._spawn_get_msg_proc()
                 proc.start()
             proc.join(timeout=1)
 
@@ -135,19 +133,16 @@ class ComsDriverReadLooop(Thread):
 
     def _spawn_get_msg_proc(
         self,
-    ) -> Tuple[mp.Process, ComsDriverReadLooop.GetMsgResults]:
-        shared = cast(
-            ComsDriverReadLooop.GetMsgResults,
-            self._mngr.dict({"result": None, "error": None}),
-        )
+    ) -> Tuple[mp.Process, Connection]:
+        a, b = mp.Pipe()
 
-        def get_msg(s: ComsDriverReadLooop.GetMsgResults) -> None:
+        def get_msg(conn: Connection) -> None:
             try:
-                s["result"] = self._get_msg()
+                conn.send(self._get_msg())
             except Exception as e:
-                s["error"] = e
+                conn.send(e)
 
-        return mp.Process(target=get_msg, args=(shared,), daemon=True), shared
+        return mp.Process(target=get_msg, args=(a,), daemon=True), b
 
     def stop(self, timeout: float | None = None) -> None:
         self._stop_event.set()
