@@ -34,9 +34,9 @@ def test_bind_queue(ls_and_loc: Tuple[LaunchStation, LocalComsDriver]):
     ls.bind_queue(ls_read)
 
     def read():
-        ls._coms.read()
-        ls._coms.read()
-        ls._coms.read()
+        ls._coms.read(timeout=5)
+        ls._coms.read(timeout=5)
+        ls._coms.read(timeout=5)
 
     t = th.Thread(target=read, daemon=True)
     t.start()
@@ -69,7 +69,7 @@ def test_state_updated_on_read(ls_and_loc: Tuple[LaunchStation, LocalComsDriver]
     ls.bind_queue(ls_read)
 
     def read():
-        ls._coms.read()
+        ls._coms.read(timeout=5)
 
     def assert_state_updated(a, q, s, ln):
         t = th.Thread(target=read, daemon=True)
