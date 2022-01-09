@@ -4,7 +4,7 @@ import multiprocessing as mp
 from abc import ABC, abstractmethod
 from multiprocessing.connection import Connection
 from threading import Condition, Event, Thread
-from typing import TYPE_CHECKING, Any, Callable, Set, Tuple
+from typing import TYPE_CHECKING, Set, Tuple
 
 from ..errors import ComsDriverReadError, ComsDriverWriteError
 from ..messages import construct_message
