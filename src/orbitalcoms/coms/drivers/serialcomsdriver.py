@@ -24,7 +24,8 @@ class SerialComsDriver(BaseComsDriver):
 
     def _write(self, m: ComsMessage) -> None:
         self.ser.write(self._preprocess_write_msg(m))
-        self.ser.flush()
+        if self.ser.in_waiting:
+            self.ser.flush()
 
     @classmethod
     def _preprocess_write_msg(cls, m: ComsMessage) -> bytes:
