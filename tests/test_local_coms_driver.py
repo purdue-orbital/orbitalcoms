@@ -77,7 +77,7 @@ def test_write_read(
     b.write(msg_b)
     a.write(msg_a)
 
-    time.sleep(1)
+    time.sleep(1.2)
 
     a_expected = [
         ComsMessage(ABORT=0, STAB=1, LAUNCH=1, QDM=0, ARMED=0, DATA={"msg": "msg #2"}),

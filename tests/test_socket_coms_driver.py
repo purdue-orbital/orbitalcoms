@@ -100,8 +100,8 @@ def test_write_read(msg_a, msg_b):
 
     client_th.start()
     time.sleep(0.2)
-    client_th.join(timeout=10)
-    host_th.join(timeout=10)
+    client_th.join(timeout=7)
+    host_th.join(timeout=7)
 
     assert not client_th.is_alive()
     assert not host_th.is_alive()

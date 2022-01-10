@@ -34,9 +34,9 @@ def test_bind_queue(gs_and_loc: Tuple[GroundStation, LocalComsDriver]):
     gs.bind_queue(gs_read)
 
     def read():
-        gs._coms.read()
-        gs._coms.read()
-        gs._coms.read()
+        gs._coms.read(timeout=5)
+        gs._coms.read(timeout=5)
+        gs._coms.read(timeout=5)
 
     t = th.Thread(target=read, daemon=True)
     t.start()
@@ -84,7 +84,7 @@ def test_data_matches_last_recv(gs_and_loc: Tuple[GroundStation, LocalComsDriver
     gs, loc = gs_and_loc
 
     def send_msg(msg):
-        t = th.Thread(target=lambda: gs._coms.read(), daemon=True)
+        t = th.Thread(target=lambda: gs._coms.read(timeout=5), daemon=True)
         t.start()
         loc.write(ComsMessage(0, 0, 0, 0, ARMED=1, DATA={"msg": msg}))
         t.join()
