@@ -2,14 +2,15 @@ import time
 
 from orbitalcoms.coms.drivers.basedriver import BaseComsDriver, ComsDriverReadLooop
 
+
 class WasteTimeComsDriver(BaseComsDriver):
     def __init__(self, wait_time) -> None:
         super().__init__()
-        self.wait_time = 1
+        self.wait_time = wait_time
 
     def _read(self):
         time.sleep(self.wait_time)
-    
+
     def _write(self, m) -> None:
         time.sleep(self.wait_time)
 
