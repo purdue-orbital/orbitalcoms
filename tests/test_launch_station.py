@@ -68,11 +68,8 @@ def test_state_updated_on_read(ls_and_loc: Tuple[LaunchStation, LocalComsDriver]
     ls_read: List[ComsMessage] = []
     ls.bind_queue(ls_read)
 
-    def read():
-        ls._coms.read(timeout=5)
-
     def assert_state_updated(a, q, s, ln):
-        t = th.Thread(target=read, daemon=True)
+        t = th.Thread(target=ls._coms.read, kwargs={"timeout": 5}, daemon=True)
         t.start()
         loc.write(ComsMessage(ABORT=a, QDM=q, STAB=s, LAUNCH=ln, ARMED=1))
         t.join()
