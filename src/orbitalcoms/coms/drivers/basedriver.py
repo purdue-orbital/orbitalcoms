@@ -4,7 +4,7 @@ import multiprocessing as mp
 from abc import ABC, abstractmethod
 from multiprocessing.connection import Connection
 from threading import Condition, Event, Thread
-from typing import TYPE_CHECKING, Set, Tuple
+from typing import TYPE_CHECKING, Protocol, Set, Tuple
 
 from ..errors import ComsDriverReadError, ComsDriverWriteError
 from ..messages import construct_message
@@ -15,13 +15,25 @@ if TYPE_CHECKING:
     from ..subscribers import ComsSubscriberLike
 
 
-class BaseComsDriver(ABC):
+class ComsStrategy(Protocol):
+    def read(self) -> ComsMessage:
+        ...
+
+    def write(self, m: ComsMessage) -> None:
+        ...
+
+
+class BaseComsDriver:
     """Base Class for any Communication Strategies"""
 
-    def __init__(self) -> None:
-        super().__init__()
+    def __init__(self, strategy: ComsStrategy) -> None:
         self.subscrbers: Set[ComsSubscriberLike] = set()
         self._read_loop: ComsDriverReadLooop | None = None
+        self._strategy = strategy
+
+    @property
+    def strategy(self) -> ComsStrategy:
+        return self._strategy
 
     def start_read_loop(self, block: bool = False) -> ComsDriverReadLooop:
         if self._read_loop:
@@ -62,22 +74,14 @@ class BaseComsDriver(ABC):
                 raise ComsDriverReadError("Failed to read next message")
         return message
 
-    @abstractmethod
-    def _read(self) -> ComsMessage:
-        ...
-
     def write(self, m: ParsableComType, suppress_errors: bool = False) -> bool:
         try:
-            self._write(construct_message(m))
+            self._strategy.write(construct_message(m))
             return True
         except Exception as e:
             if suppress_errors:
                 return False
             raise ComsDriverWriteError(f"Failed to send message '{m}'") from e
-
-    @abstractmethod
-    def _write(self, m: ComsMessage) -> None:
-        ...
 
     def register_subscriber(self, sub: ComsSubscriberLike) -> None:
         self.subscrbers.add(sub)
@@ -133,7 +137,7 @@ class ComsDriverReadLooop(Thread):
 
         def get_msg(conn: Connection) -> None:
             try:
-                conn.send(self._coms._read())
+                conn.send(self._coms.strategy.read())
             except Exception as e:
                 conn.send(e)
 

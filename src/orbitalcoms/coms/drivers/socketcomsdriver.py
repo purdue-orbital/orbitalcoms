@@ -4,15 +4,13 @@ import socket
 
 from ..errors import ComsDriverReadError, ComsDriverWriteError
 from ..messages import ComsMessage, construct_message
-from .basedriver import BaseComsDriver
+from .basedriver import BaseComsDriver, ComsStrategy
 
 
 class SocketComsDriver(BaseComsDriver):
-    __HEADER = 64
-
     def __init__(self, sock: socket.socket) -> None:
-        super().__init__()
-        self._sock = sock
+        super().__init__(SocketComsStrategy(sock))
+        self._sock = sock # TODO: Remove
 
     @classmethod
     def accept_connection_at(cls, host: str = "", port: int = 5000) -> SocketComsDriver:
@@ -28,21 +26,27 @@ class SocketComsDriver(BaseComsDriver):
         sock.connect((host, port))
         return cls(sock)
 
-    def _read(self) -> ComsMessage:
-        head = self._sock.recv(self.__HEADER).decode()
+
+class SocketComsStrategy(ComsStrategy):
+    __HEADER = 64
+    __ENCODING = "utf-8"
+
+    def __init__(self, socket: socket.socket) -> None:
+        self.sock = socket
+
+    def read(self) -> ComsMessage:
+        head = self.sock.recv(self.__HEADER).decode(encoding=self.__ENCODING)
         if not head:
             raise ComsDriverReadError(f"Invalid header recieved: '{head}'")
-        try:
-            msg = self._sock.recv(int(head)).decode()
-            return construct_message(msg)
-        except Exception as e:
-            raise ComsDriverReadError(f"Invalid message recieved: '{msg}'") from e
+        return construct_message(
+            self.sock.recv(int(head)).decode(encoding=self.__ENCODING)
+        )
 
-    def _write(self, m: ComsMessage) -> None:
-        msg = m.as_str.encode()
-        header = str(len(msg)).encode()
+    def write(self, m: ComsMessage) -> None:
+        msg = m.as_str.encode(encoding=self.__ENCODING)
+        header = str(len(msg)).encode(self.__ENCODING)
         if len(header) > self.__HEADER:
             raise ComsDriverWriteError("Message too long to generate header")
         header += b" " * (self.__HEADER - len(header))
-        self._sock.send(header)
-        self._sock.send(msg)
+        self.sock.send(header)
+        self.sock.send(msg)
