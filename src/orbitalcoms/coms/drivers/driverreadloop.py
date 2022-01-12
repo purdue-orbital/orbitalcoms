@@ -39,9 +39,7 @@ class ComsDriverReadLoop(Thread):
         if proc.is_alive():
             proc.terminate()
 
-    def _spawn_get_msg_proc(
-        self,
-    ) -> Tuple[mp.Process, Connection]:
+    def _spawn_get_msg_proc(self) -> Tuple[mp.Process, Connection]:
         a, b = mp.Pipe()
 
         def get_msg(conn: Connection) -> None:
