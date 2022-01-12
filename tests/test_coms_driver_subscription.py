@@ -1,5 +1,6 @@
-from orbitalcoms.coms.drivers.localcomsdriver import LocalComsDriver
+from orbitalcoms.coms.drivers import ComsDriver
 from orbitalcoms.coms.messages.message import ComsMessage
+from orbitalcoms.coms.strategies import LocalComsStrategy
 from orbitalcoms.coms.subscribers.subscription import (
     ComsSubscription,
     OneTimeComsSubscription,
@@ -7,7 +8,7 @@ from orbitalcoms.coms.subscribers.subscription import (
 
 
 def test_coms_subscription():
-    ld = LocalComsDriver()
+    local_driver = ComsDriver(LocalComsStrategy())
     count = 0
 
     def count_up(m: ComsMessage):
@@ -15,22 +16,22 @@ def test_coms_subscription():
         count += m.ABORT + m.QDM + m.LAUNCH + m.STAB
 
     cs = ComsSubscription(count_up)
-    ld.register_subscriber(cs)
-    ld._notify_subscribers(ComsMessage(1, 1, 0, 0))
-    ld._notify_subscribers(ComsMessage(0, 0, 0, 1))
-    ld._notify_subscribers(ComsMessage(1, 1, 1, 0))
+    local_driver.register_subscriber(cs)
+    local_driver._notify_subscribers(ComsMessage(1, 1, 0, 0))
+    local_driver._notify_subscribers(ComsMessage(0, 0, 0, 1))
+    local_driver._notify_subscribers(ComsMessage(1, 1, 1, 0))
 
     assert count == 6
-    assert cs in ld.subscrbers
+    assert cs in local_driver.subscrbers
 
-    ld.unregister_subscriber(cs)
-    ld._notify_subscribers(ComsMessage(1, 1, 1, 0))
+    local_driver.unregister_subscriber(cs)
+    local_driver._notify_subscribers(ComsMessage(1, 1, 1, 0))
     assert count == 6
-    assert cs not in ld.subscrbers
+    assert cs not in local_driver.subscrbers
 
 
 def test_onetime_coms_subscription():
-    ld = LocalComsDriver()
+    local_driver = ComsDriver(LocalComsStrategy())
     count = 0
 
     def count_up(m: ComsMessage):
@@ -38,17 +39,17 @@ def test_onetime_coms_subscription():
         count += m.ABORT + m.QDM + m.LAUNCH + m.STAB
 
     ocs = OneTimeComsSubscription(count_up)
-    ld.register_subscriber(ocs)
-    ld._notify_subscribers(ComsMessage(1, 1, 0, 0))
-    ld._notify_subscribers(ComsMessage(0, 0, 0, 1))
-    ld._notify_subscribers(ComsMessage(1, 1, 1, 0))
+    local_driver.register_subscriber(ocs)
+    local_driver._notify_subscribers(ComsMessage(1, 1, 0, 0))
+    local_driver._notify_subscribers(ComsMessage(0, 0, 0, 1))
+    local_driver._notify_subscribers(ComsMessage(1, 1, 1, 0))
 
     assert count == 2
-    assert ocs not in ld.subscrbers
+    assert ocs not in local_driver.subscrbers
 
 
 def test_subscriptions_with_errs():
-    ld = LocalComsDriver()
+    local_driver = ComsDriver(LocalComsStrategy())
 
     def raise_err(_: ComsMessage):
         raise Exception("Yikes, an error happend")
@@ -56,22 +57,22 @@ def test_subscriptions_with_errs():
     cs = ComsSubscription(raise_err)
     cs_expect_err = ComsSubscription(raise_err, expect_err=True)
 
-    ld.register_subscriber(cs)
-    ld.register_subscriber(cs_expect_err)
-    ld._notify_subscribers(ComsMessage(0, 0, 0, 1))
-    ld._notify_subscribers(ComsMessage(0, 0, 0, 1))
-    ld._notify_subscribers(ComsMessage(0, 0, 0, 1))
+    local_driver.register_subscriber(cs)
+    local_driver.register_subscriber(cs_expect_err)
+    local_driver._notify_subscribers(ComsMessage(0, 0, 0, 1))
+    local_driver._notify_subscribers(ComsMessage(0, 0, 0, 1))
+    local_driver._notify_subscribers(ComsMessage(0, 0, 0, 1))
 
-    assert cs not in ld.subscrbers
-    assert cs_expect_err in ld.subscrbers
+    assert cs not in local_driver.subscrbers
+    assert cs_expect_err in local_driver.subscrbers
 
-    ld.unregister_subscriber(cs_expect_err)
-    assert cs_expect_err not in ld.subscrbers
+    local_driver.unregister_subscriber(cs_expect_err)
+    assert cs_expect_err not in local_driver.subscrbers
 
 
 def test_unregister_never_registered_subscriber():
-    ld = LocalComsDriver()
+    local_driver = ComsDriver(LocalComsStrategy())
     cs = ComsSubscription(lambda _: ...)
 
     # Make sure this does not error
-    ld.unregister_subscriber(cs)
+    local_driver.unregister_subscriber(cs)

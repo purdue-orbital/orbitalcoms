@@ -2,8 +2,8 @@
 dependency injection
 """
 
-from ..coms.drivers.serialcomsdriver import SerialComsDriver
-from ..coms.drivers.socketcomsdriver import SocketComsDriver
+from ..coms.drivers import ComsDriver
+from ..coms.strategies import SerialComsStrategy, SocketComsStrategy
 from .groundstation import GroundStation
 from .launchstation import LaunchStation
 
@@ -14,7 +14,9 @@ def create_socket_luanch_station(
     """Convinence function for creating a Launch Station
     that communicates using a socket connection
     """
-    return LaunchStation(SocketComsDriver.accept_connection_at(host, port))
+    return LaunchStation(
+        ComsDriver(SocketComsStrategy.accept_connection_at(host, port))
+    )
 
 
 def create_socket_ground_station(
@@ -23,18 +25,18 @@ def create_socket_ground_station(
     """Convinence function for creating a Ground Station
     that communicates using a socket connection
     """
-    return GroundStation(SocketComsDriver.connect_to(host, port))
+    return GroundStation(ComsDriver(SocketComsStrategy.connect_to(host, port)))
 
 
 def create_serial_launch_station(port: str, baudrate: int) -> LaunchStation:
     """Convinence function for creating a Launch Station
     that communicates using a serial port
     """
-    return LaunchStation(SerialComsDriver(port, baudrate))
+    return LaunchStation(ComsDriver(SerialComsStrategy.from_args(port, baudrate)))
 
 
 def create_serial_ground_station(port: str, baudrate: int) -> GroundStation:
     """Convinence function for creating a Ground Station
     that communicates using a serial port
     """
-    return GroundStation(SerialComsDriver(port, baudrate))
+    return GroundStation(ComsDriver(SerialComsStrategy.from_args(port, baudrate)))

@@ -1,15 +1,15 @@
 def test_top_level_imports():
     """Test important importorts can be accessaed from top level"""
     from orbitalcoms import (  # noqa: F401
-        BaseComsDriver,
+        ComsDriver,
         ComsMessage,
         ComsSubscription,
         GroundStation,
         LaunchStation,
-        LocalComsDriver,
+        LocalComsStrategy,
         OneTimeComsSubscription,
-        SerialComsDriver,
-        SocketComsDriver,
+        SerialComsStrategy,
+        SocketComsStrategy,
         construct_message,
         create_serial_ground_station,
         create_serial_launch_station,

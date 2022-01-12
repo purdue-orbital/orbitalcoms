@@ -4,29 +4,24 @@ import time
 
 import pytest
 
-from orbitalcoms.coms.drivers.serialcomsdriver import SerialComsDriver
+from orbitalcoms.coms.drivers.driver import ComsDriver
 from orbitalcoms.coms.messages.message import ComsMessage, construct_message
+from orbitalcoms.coms.strategies.serialstrat import SerialComsStrategy
 from orbitalcoms.coms.subscribers.subscription import ComsSubscription
 
 
 def test_port_access():
     m, _ = pty.openpty()
     m_name = os.ttyname(m)
-    s = SerialComsDriver(m_name, 9600)
-
-    assert m_name == s.port
-    with pytest.raises(AttributeError):
-        s.port = "should not be assignable"
+    s = SerialComsStrategy.from_args(m_name, 9600)
+    assert m_name == s.ser.port
 
 
 def test_baudrate_access():
     m, _ = pty.openpty()
     m_name = os.ttyname(m)
-    s = SerialComsDriver(m_name, 9600)
-
-    assert 9600 == s.baudrate
-    with pytest.raises(AttributeError):
-        s.baudrate = 5000
+    s = SerialComsStrategy.from_args(m_name, 9600)
+    assert 9600 == s.ser.baudrate
 
 
 @pytest.mark.parametrize(
@@ -52,7 +47,7 @@ def test_baudrate_access():
 def test_write(msg_a, msg_b):
     m, s = pty.openpty()
     s_name = os.ttyname(s)
-    coms = SerialComsDriver(s_name, 9600)
+    coms = ComsDriver(SerialComsStrategy.from_args(s_name, 9600))
 
     coms.write(msg_b)
     coms.write(msg_b)
@@ -92,15 +87,15 @@ def test_write(msg_a, msg_b):
 def test_preproc_and_read():
     m, s = pty.openpty()
     s_name = os.ttyname(s)
-    coms = SerialComsDriver(s_name, 9600)
+    coms = ComsDriver(SerialComsStrategy.from_args(s_name, 9600))
 
     msg_a = ComsMessage(ABORT=0, ARMED=0, QDM=1, STAB=0, LAUNCH=0)
     msg_b = ComsMessage(ABORT=1, ARMED=1, QDM=1, STAB=0, LAUNCH=0)
     read = []
     coms.register_subscriber(ComsSubscription(lambda m: read.append(m)))
-    os.write(m, SerialComsDriver._preprocess_write_msg(msg_b))
-    os.write(m, SerialComsDriver._preprocess_write_msg(msg_a))
-    os.write(m, SerialComsDriver._preprocess_write_msg(msg_b))
+    os.write(m, SerialComsStrategy._preprocess_write_msg(msg_b))
+    os.write(m, SerialComsStrategy._preprocess_write_msg(msg_a))
+    os.write(m, SerialComsStrategy._preprocess_write_msg(msg_b))
     coms.start_read_loop()
     coms.read(timeout=5)
     coms.read(timeout=5)
