@@ -13,6 +13,7 @@ class WastTimeStrat:
     def read(self):
         time.sleep(self.time)
 
+
 def test_start_stop_read_loop():
     # Not gonna pass type checking, just make sure it wakes up and dies
     rl = ComsDriverReadLooop(BaseComsDriver(WastTimeStrat(1)), daemon=True)

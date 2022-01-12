@@ -1,40 +1,19 @@
 from __future__ import annotations
-from typing import cast
 
 import serial
 
+from ..drivers.basedriver import ComsStrategy
 from ..messages import ComsMessage, construct_message
-from .basedriver import BaseComsDriver, ComsStrategy
 
 
-class SerialComsDriver(BaseComsDriver):
-    def __init__(self, port: str, baudrate: int) -> None:
-        super().__init__(SerialComsStartegy.from_args(port, baudrate))
-
-    @property
-    def port(self) -> str:
-        # TODO: Remove
-        return str(cast(SerialComsStartegy, self.strategy).ser.port)
-
-    @property
-    def baudrate(self) -> int:
-        # TODO: Remove
-        return int(cast(SerialComsStartegy, self.strategy).ser.baudrate)
-
-    @staticmethod
-    def _preprocess_write_msg(m: ComsMessage) -> bytes:
-        # TODO: Remove
-        return SerialComsStartegy._preprocess_write_msg(m)
-
-
-class SerialComsStartegy(ComsStrategy):
+class SerialComsStrategy(ComsStrategy):
     __ENCODING = "utf-8"
 
     def __init__(self, serial: serial.Serial) -> None:
         self.ser = serial
 
     @classmethod
-    def from_args(cls, port: str, baudrate: int) -> SerialComsStartegy:
+    def from_args(cls, port: str, baudrate: int) -> SerialComsStrategy:
         return cls(serial.Serial(port=port, baudrate=baudrate))
 
     def read(self) -> ComsMessage:

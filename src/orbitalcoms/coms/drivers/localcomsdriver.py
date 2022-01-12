@@ -4,7 +4,6 @@ import multiprocessing as mp
 import time
 from typing import List, Set, Tuple
 
-
 from ..messages import ComsMessage, construct_message
 from .basedriver import BaseComsDriver, ComsStrategy
 

@@ -10,7 +10,7 @@ from .basedriver import BaseComsDriver, ComsStrategy
 class SocketComsDriver(BaseComsDriver):
     def __init__(self, sock: socket.socket) -> None:
         super().__init__(SocketComsStrategy(sock))
-        self._sock = sock # TODO: Remove
+        self._sock = sock  # TODO: Remove
 
     @classmethod
     def accept_connection_at(cls, host: str = "", port: int = 5000) -> SocketComsDriver:

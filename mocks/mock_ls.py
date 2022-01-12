@@ -58,7 +58,7 @@ def main() -> int:
     return 0
 
 
-def send_radio_state(ls: LaunchStation):
+def send_radio_state(ls: LaunchStation) -> None:
     while True:
         if not ls.send(
             {
@@ -92,7 +92,7 @@ def send_radio_state(ls: LaunchStation):
         time.sleep(2)
 
 
-def get_args():
+def get_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser()
     parser.add_argument(
         "--delay",

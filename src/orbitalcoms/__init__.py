@@ -7,7 +7,7 @@ from .coms import (
     ComsSubscription,
     LocalComsDriver,
     OneTimeComsSubscription,
-    SerialComsDriver,
+    SerialComsStrategy,
     SocketComsDriver,
     construct_message,
 )
@@ -30,7 +30,7 @@ __all__ = [
     "ComsSubscription",
     "LocalComsDriver",
     "OneTimeComsSubscription",
-    "SerialComsDriver",
+    "SerialComsStrategy",
     "SocketComsDriver",
     "construct_message",
     "GroundStation",
