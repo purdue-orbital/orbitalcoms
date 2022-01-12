@@ -2,29 +2,9 @@ from __future__ import annotations
 
 import socket
 
-from ..errors import ComsDriverReadError, ComsDriverWriteError
-from ..messages import ComsMessage, construct_message
-from .basedriver import BaseComsDriver, ComsStrategy
-
-
-class SocketComsDriver(BaseComsDriver):
-    def __init__(self, sock: socket.socket) -> None:
-        super().__init__(SocketComsStrategy(sock))
-        self._sock = sock  # TODO: Remove
-
-    @classmethod
-    def accept_connection_at(cls, host: str = "", port: int = 5000) -> SocketComsDriver:
-        with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as server:
-            server.bind((host, port))
-            server.listen(0)
-            conn, _ = server.accept()
-        return cls(conn)
-
-    @classmethod
-    def connect_to(cls, host: str = "", port: int = 5000) -> SocketComsDriver:
-        sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        sock.connect((host, port))
-        return cls(sock)
+from ..drivers.basedriver import ComsStrategy
+from ..errors.errors import ComsDriverReadError, ComsDriverWriteError
+from ..messages.message import ComsMessage, construct_message
 
 
 class SocketComsStrategy(ComsStrategy):
@@ -33,6 +13,22 @@ class SocketComsStrategy(ComsStrategy):
 
     def __init__(self, socket: socket.socket) -> None:
         self.sock = socket
+
+    @classmethod
+    def accept_connection_at(
+        cls, host: str = "", port: int = 5000
+    ) -> SocketComsStrategy:
+        with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as server:
+            server.bind((host, port))
+            server.listen(0)
+            conn, _ = server.accept()
+        return cls(conn)
+
+    @classmethod
+    def connect_to(cls, host: str = "", port: int = 5000) -> SocketComsStrategy:
+        sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        sock.connect((host, port))
+        return cls(sock)
 
     def read(self) -> ComsMessage:
         head = self.sock.recv(self.__HEADER).decode(encoding=self.__ENCODING)

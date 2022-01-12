@@ -2,8 +2,8 @@ import argparse
 from typing import Protocol, cast
 
 import orbitalcoms._app.tkgui as tkgui
-from orbitalcoms.coms.drivers import BaseComsDriver, SocketComsDriver
-from orbitalcoms.coms.strategies import SerialComsStrategy
+from orbitalcoms.coms.drivers import BaseComsDriver
+from orbitalcoms.coms.strategies import SerialComsStrategy, SocketComsStrategy
 from orbitalcoms.stations.groundstation import GroundStation
 
 
@@ -26,8 +26,8 @@ def main() -> None:
     args = get_args()
     if args.connection == "socket":
         args = cast(SocketArgs, args)
-        coms: BaseComsDriver = SocketComsDriver.connect_to(
-            host=args.host, port=args.port
+        coms = BaseComsDriver(
+            SocketComsStrategy.connect_to(host=args.host, port=args.port)
         )
     elif args.connection == "serial":
         args = cast(SerialArgs, args)

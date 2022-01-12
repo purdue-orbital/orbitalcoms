@@ -9,7 +9,7 @@ def test_top_level_imports():
         LocalComsDriver,
         OneTimeComsSubscription,
         SerialComsStrategy,
-        SocketComsDriver,
+        SocketComsStrategy,
         construct_message,
         create_serial_ground_station,
         create_serial_launch_station,

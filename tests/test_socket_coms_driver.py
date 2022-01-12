@@ -4,8 +4,9 @@ import time
 
 import pytest
 
-from orbitalcoms.coms.drivers.socketcomsdriver import SocketComsDriver
+from orbitalcoms.coms.drivers.basedriver import BaseComsDriver
 from orbitalcoms.coms.messages.message import ComsMessage
+from orbitalcoms.coms.strategies.socketcomsstrategy import SocketComsStrategy
 
 
 @pytest.mark.parametrize(
@@ -48,7 +49,9 @@ def test_write_read(msg_a, msg_b):
         with portcv:
             portcv.notify()
 
-        coms = SocketComsDriver.accept_connection_at("127.0.1.1", port)
+        coms = BaseComsDriver(
+            SocketComsStrategy.accept_connection_at("127.0.1.1", port)
+        )
         coms.start_read_loop()
 
         with readcv:
@@ -68,7 +71,7 @@ def test_write_read(msg_a, msg_b):
     def _client():
         nonlocal client_read, ready_switcher
         time.sleep(0.3)
-        coms = SocketComsDriver.connect_to("127.0.1.1", port)
+        coms = BaseComsDriver(SocketComsStrategy.connect_to("127.0.1.1", port))
         coms.start_read_loop()
 
         with readcv:
@@ -119,4 +122,4 @@ def test_write_read(msg_a, msg_b):
 def test_error_when_cannot_connect():
     # this test will fail if something is running on 5000
     with pytest.raises(ConnectionRefusedError):
-        SocketComsDriver.connect_to("127.0.1.1", 5000)
+        SocketComsStrategy.connect_to("127.0.1.1", 5000)
