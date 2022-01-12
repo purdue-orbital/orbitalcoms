@@ -6,13 +6,13 @@ from threading import Event, Thread
 from typing import TYPE_CHECKING, Tuple
 
 if TYPE_CHECKING:
-    from .basedriver import BaseComsDriver
+    from .driver import ComsDriver
 
 
-class ComsDriverReadLooop(Thread):
+class ComsDriverReadLoop(Thread):
     def __init__(
         self,
-        coms: BaseComsDriver,
+        coms: ComsDriver,
         name: str | None = None,
         daemon: bool | None = None,
     ) -> None:

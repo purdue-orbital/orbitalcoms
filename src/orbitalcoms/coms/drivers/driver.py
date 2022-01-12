@@ -6,7 +6,7 @@ from typing import TYPE_CHECKING, Set
 from ..errors import ComsDriverReadError, ComsDriverWriteError
 from ..messages import construct_message
 from ..subscribers import OneTimeComsSubscription
-from .driverreadloop import ComsDriverReadLooop
+from .driverreadloop import ComsDriverReadLoop
 
 if TYPE_CHECKING:
     from ..messages import ComsMessage, ParsableComType
@@ -14,19 +14,19 @@ if TYPE_CHECKING:
     from ..subscribers import ComsSubscriberLike
 
 
-class BaseComsDriver:
-    """Base Class for any Communication Strategies"""
+class ComsDriver:
+    """Drive Communication using a strategy"""
 
     def __init__(self, strategy: ComsStrategy) -> None:
         self.subscrbers: Set[ComsSubscriberLike] = set()
-        self._read_loop: ComsDriverReadLooop | None = None
+        self._read_loop: ComsDriverReadLoop | None = None
         self._strategy = strategy
 
     @property
     def strategy(self) -> ComsStrategy:
         return self._strategy
 
-    def start_read_loop(self, block: bool = False) -> ComsDriverReadLooop:
+    def start_read_loop(self, block: bool = False) -> ComsDriverReadLoop:
         if self._read_loop:
             self.end_read_loop()
         self._read_loop = self._spawn_read_loop_thread()
@@ -41,8 +41,8 @@ class BaseComsDriver:
                 self._read_loop.stop(timeout=timeout)
             self._read_loop = None
 
-    def _spawn_read_loop_thread(self) -> ComsDriverReadLooop:
-        return ComsDriverReadLooop(self, daemon=True)
+    def _spawn_read_loop_thread(self) -> ComsDriverReadLoop:
+        return ComsDriverReadLoop(self, daemon=True)
 
     @property
     def is_reading(self) -> bool:

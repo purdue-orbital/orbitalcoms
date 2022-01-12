@@ -3,7 +3,7 @@ from typing import List, Tuple
 
 import pytest
 
-from orbitalcoms.coms.drivers.basedriver import BaseComsDriver
+from orbitalcoms.coms.drivers.driver import ComsDriver
 from orbitalcoms.coms.messages.message import ComsMessage
 from orbitalcoms.coms.strategies.localcomsstrategy import get_linked_local_strats
 from orbitalcoms.coms.subscribers.subscription import ComsSubscription
@@ -11,17 +11,17 @@ from orbitalcoms.stations.groundstation import GroundStation
 
 
 @pytest.fixture
-def gs_and_loc() -> Tuple[GroundStation, BaseComsDriver]:
+def gs_and_loc() -> Tuple[GroundStation, ComsDriver]:
     a_strat, b_strat = get_linked_local_strats()
-    a = BaseComsDriver(a_strat)
-    b = BaseComsDriver(b_strat)
+    a = ComsDriver(a_strat)
+    b = ComsDriver(b_strat)
     gs = GroundStation(a)
     yield gs, b
     a.end_read_loop()
     b.end_read_loop()
 
 
-def test_all_fields_start_false(gs_and_loc: Tuple[GroundStation, BaseComsDriver]):
+def test_all_fields_start_false(gs_and_loc: Tuple[GroundStation, ComsDriver]):
     gs, _ = gs_and_loc
     assert gs.abort is False
     assert gs.qdm is False
@@ -31,7 +31,7 @@ def test_all_fields_start_false(gs_and_loc: Tuple[GroundStation, BaseComsDriver]
     assert gs.data is None
 
 
-def test_bind_queue(gs_and_loc: Tuple[GroundStation, BaseComsDriver]):
+def test_bind_queue(gs_and_loc: Tuple[GroundStation, ComsDriver]):
     gs, loc = gs_and_loc
     gs_read: List[ComsMessage] = []
     gs.bind_queue(gs_read)
@@ -66,7 +66,7 @@ def test_bind_queue(gs_and_loc: Tuple[GroundStation, BaseComsDriver]):
         assert msg.DATA["msg"] == f"this is msg #{i+1}"
 
 
-def test_state_mataches_sent(gs_and_loc: Tuple[GroundStation, BaseComsDriver]):
+def test_state_mataches_sent(gs_and_loc: Tuple[GroundStation, ComsDriver]):
     gs, _ = gs_and_loc
 
     def send_msg(a, q, s, ln):
@@ -83,7 +83,7 @@ def test_state_mataches_sent(gs_and_loc: Tuple[GroundStation, BaseComsDriver]):
     send_msg(1, 1, 1, 1)
 
 
-def test_data_matches_last_recv(gs_and_loc: Tuple[GroundStation, BaseComsDriver]):
+def test_data_matches_last_recv(gs_and_loc: Tuple[GroundStation, ComsDriver]):
     gs, loc = gs_and_loc
 
     def send_msg(msg):
@@ -100,7 +100,7 @@ def test_data_matches_last_recv(gs_and_loc: Tuple[GroundStation, BaseComsDriver]
     assert gs.data["msg"] == ":)"
 
 
-def test_send_bad_msg_fails(gs_and_loc: Tuple[GroundStation, BaseComsDriver]):
+def test_send_bad_msg_fails(gs_and_loc: Tuple[GroundStation, ComsDriver]):
     gs, loc = gs_and_loc
     loc_read = []
     loc.register_subscriber(ComsSubscription(lambda m: loc_read.append(m)))
@@ -110,7 +110,7 @@ def test_send_bad_msg_fails(gs_and_loc: Tuple[GroundStation, BaseComsDriver]):
 
 
 @pytest.mark.skip(reason="Feature not implimented")
-def test_data_retains_unupdated_keys(gs_and_loc: Tuple[GroundStation, BaseComsDriver]):
+def test_data_retains_unupdated_keys(gs_and_loc: Tuple[GroundStation, ComsDriver]):
     gs, loc = gs_and_loc
 
     loc.write(ComsMessage(0, 0, 0, 0, ARMED=1, DATA={"key1": 1}))
@@ -124,7 +124,7 @@ def test_data_retains_unupdated_keys(gs_and_loc: Tuple[GroundStation, BaseComsDr
 
 
 @pytest.mark.skip(reason="Feature not implimented")
-def test_station_does_not_unarm(gs_and_loc: Tuple[GroundStation, BaseComsDriver]):
+def test_station_does_not_unarm(gs_and_loc: Tuple[GroundStation, ComsDriver]):
     gs, _ = gs_and_loc
 
     with pytest.raises(Exception):  # TODO: tighter exception needed

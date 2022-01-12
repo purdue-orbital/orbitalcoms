@@ -1,6 +1,6 @@
-from orbitalcoms.coms.drivers import BaseComsDriver
-from orbitalcoms.coms.strategies import LocalComsStrategy
+from orbitalcoms.coms.drivers import ComsDriver
 from orbitalcoms.coms.messages.message import ComsMessage
+from orbitalcoms.coms.strategies import LocalComsStrategy
 from orbitalcoms.coms.subscribers.subscription import (
     ComsSubscription,
     OneTimeComsSubscription,
@@ -8,7 +8,7 @@ from orbitalcoms.coms.subscribers.subscription import (
 
 
 def test_coms_subscription():
-    local_driver = BaseComsDriver(LocalComsStrategy())
+    local_driver = ComsDriver(LocalComsStrategy())
     count = 0
 
     def count_up(m: ComsMessage):
@@ -31,7 +31,7 @@ def test_coms_subscription():
 
 
 def test_onetime_coms_subscription():
-    local_driver = BaseComsDriver(LocalComsStrategy())
+    local_driver = ComsDriver(LocalComsStrategy())
     count = 0
 
     def count_up(m: ComsMessage):
@@ -49,7 +49,7 @@ def test_onetime_coms_subscription():
 
 
 def test_subscriptions_with_errs():
-    local_driver = BaseComsDriver(LocalComsStrategy())
+    local_driver = ComsDriver(LocalComsStrategy())
 
     def raise_err(_: ComsMessage):
         raise Exception("Yikes, an error happend")
@@ -71,7 +71,7 @@ def test_subscriptions_with_errs():
 
 
 def test_unregister_never_registered_subscriber():
-    local_driver = BaseComsDriver(LocalComsStrategy())
+    local_driver = ComsDriver(LocalComsStrategy())
     cs = ComsSubscription(lambda _: ...)
 
     # Make sure this does not error

@@ -1,5 +1,5 @@
 from .coms import (
-    BaseComsDriver,
+    ComsDriver,
     ComsDriverReadError,
     ComsDriverWriteError,
     ComsMessage,
@@ -22,7 +22,7 @@ from .stations import (
 )
 
 __all__ = [
-    "BaseComsDriver",
+    "ComsDriver",
     "ComsDriverReadError",
     "ComsDriverWriteError",
     "ComsMessage",

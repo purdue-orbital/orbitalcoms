@@ -4,7 +4,7 @@ import time
 
 import pytest
 
-from orbitalcoms.coms.drivers.basedriver import BaseComsDriver
+from orbitalcoms.coms.drivers.driver import ComsDriver
 from orbitalcoms.coms.messages.message import ComsMessage, construct_message
 from orbitalcoms.coms.strategies.serialcomsstrategy import SerialComsStrategy
 from orbitalcoms.coms.subscribers.subscription import ComsSubscription
@@ -47,7 +47,7 @@ def test_baudrate_access():
 def test_write(msg_a, msg_b):
     m, s = pty.openpty()
     s_name = os.ttyname(s)
-    coms = BaseComsDriver(SerialComsStrategy.from_args(s_name, 9600))
+    coms = ComsDriver(SerialComsStrategy.from_args(s_name, 9600))
 
     coms.write(msg_b)
     coms.write(msg_b)
@@ -87,7 +87,7 @@ def test_write(msg_a, msg_b):
 def test_preproc_and_read():
     m, s = pty.openpty()
     s_name = os.ttyname(s)
-    coms = BaseComsDriver(SerialComsStrategy.from_args(s_name, 9600))
+    coms = ComsDriver(SerialComsStrategy.from_args(s_name, 9600))
 
     msg_a = ComsMessage(ABORT=0, ARMED=0, QDM=1, STAB=0, LAUNCH=0)
     msg_b = ComsMessage(ABORT=1, ARMED=1, QDM=1, STAB=0, LAUNCH=0)

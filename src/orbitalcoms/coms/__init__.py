@@ -1,12 +1,12 @@
-from .drivers import BaseComsDriver, ComsDriverReadLooop
+from .drivers import ComsDriver, ComsDriverReadLoop
 from .errors import ComsDriverReadError, ComsDriverWriteError, ComsMessageParseError
 from .messages import ComsMessage, ParsableComType, construct_message
 from .strategies import LocalComsStrategy, SerialComsStrategy, SocketComsStrategy
 from .subscribers import ComsSubscriberLike, ComsSubscription, OneTimeComsSubscription
 
 __all__ = [
-    "BaseComsDriver",
-    "ComsDriverReadLooop",
+    "ComsDriver",
+    "ComsDriverReadLoop",
     "LocalComsStrategy",
     "SerialComsStrategy",
     "SocketComsStrategy",

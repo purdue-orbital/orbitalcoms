@@ -1,4 +1,4 @@
-from .basedriver import BaseComsDriver
-from .driverreadloop import ComsDriverReadLooop
+from .driver import ComsDriver
+from .driverreadloop import ComsDriverReadLoop
 
-__all__ = ["BaseComsDriver", "ComsDriverReadLooop"]
+__all__ = ["ComsDriver", "ComsDriverReadLoop"]

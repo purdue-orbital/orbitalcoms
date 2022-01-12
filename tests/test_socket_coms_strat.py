@@ -4,7 +4,7 @@ import time
 
 import pytest
 
-from orbitalcoms.coms.drivers.basedriver import BaseComsDriver
+from orbitalcoms.coms.drivers.driver import ComsDriver
 from orbitalcoms.coms.messages.message import ComsMessage
 from orbitalcoms.coms.strategies.socketcomsstrategy import SocketComsStrategy
 
@@ -49,9 +49,7 @@ def test_write_read(msg_a, msg_b):
         with portcv:
             portcv.notify()
 
-        coms = BaseComsDriver(
-            SocketComsStrategy.accept_connection_at("127.0.1.1", port)
-        )
+        coms = ComsDriver(SocketComsStrategy.accept_connection_at("127.0.1.1", port))
         coms.start_read_loop()
 
         with readcv:
@@ -71,7 +69,7 @@ def test_write_read(msg_a, msg_b):
     def _client():
         nonlocal client_read, ready_switcher
         time.sleep(0.3)
-        coms = BaseComsDriver(SocketComsStrategy.connect_to("127.0.1.1", port))
+        coms = ComsDriver(SocketComsStrategy.connect_to("127.0.1.1", port))
         coms.start_read_loop()
 
         with readcv:
