@@ -6,7 +6,7 @@ import pytest
 
 from orbitalcoms.coms.drivers.driver import ComsDriver
 from orbitalcoms.coms.messages.message import ComsMessage
-from orbitalcoms.coms.strategies.socketcomsstrategy import SocketComsStrategy
+from orbitalcoms.coms.strategies.socketstrat import SocketComsStrategy
 
 
 @pytest.mark.parametrize(

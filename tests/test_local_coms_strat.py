@@ -7,7 +7,7 @@ import pytest
 from orbitalcoms.coms.drivers.driver import ComsDriver
 from orbitalcoms.coms.errors.errors import ComsDriverWriteError
 from orbitalcoms.coms.messages.message import ComsMessage
-from orbitalcoms.coms.strategies.localcomsstrategy import get_linked_local_strats
+from orbitalcoms.coms.strategies.localstrat import get_linked_local_strats
 from orbitalcoms.coms.subscribers.subscription import ComsSubscription
 
 

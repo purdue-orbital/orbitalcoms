@@ -6,7 +6,7 @@ import pytest
 
 from orbitalcoms.coms.drivers.driver import ComsDriver
 from orbitalcoms.coms.messages.message import ComsMessage, construct_message
-from orbitalcoms.coms.strategies.serialcomsstrategy import SerialComsStrategy
+from orbitalcoms.coms.strategies.serialstrat import SerialComsStrategy
 from orbitalcoms.coms.subscribers.subscription import ComsSubscription
 
 

@@ -1,6 +1,6 @@
-from .localcomsstrategy import LocalComsStrategy
-from .serialcomsstrategy import SerialComsStrategy
-from .socketcomsstrategy import SocketComsStrategy
+from .localstrat import LocalComsStrategy
+from .serialstrat import SerialComsStrategy
+from .socketstrat import SocketComsStrategy
 from .strategy import ComsStrategy
 
 __all__ = [
