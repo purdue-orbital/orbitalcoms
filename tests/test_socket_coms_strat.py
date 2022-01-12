@@ -66,7 +66,7 @@ def test_write_read(msg_a, msg_b):
         coms.write(msg_a)
 
         coms.end_read_loop()
-        coms._sock.close()
+        coms.strategy.sock.close()
 
     def _client():
         nonlocal client_read, ready_switcher
@@ -87,8 +87,8 @@ def test_write_read(msg_a, msg_b):
         client_read = coms.read()
         coms.end_read_loop()
 
-        coms._sock.shutdown(socket.SHUT_RDWR)
-        coms._sock.close()
+        coms.strategy.sock.shutdown(socket.SHUT_RDWR)
+        coms.strategy.sock.close()
 
     # TODO: This threading can deadlock, doesn't happen for the most part so good
     # enough for now, but shouldn't deadlock in first place
