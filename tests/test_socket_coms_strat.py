@@ -4,8 +4,9 @@ import time
 
 import pytest
 
-from orbitalcoms.coms.drivers.socketcomsdriver import SocketComsDriver
+from orbitalcoms.coms.drivers.driver import ComsDriver
 from orbitalcoms.coms.messages.message import ComsMessage
+from orbitalcoms.coms.strategies.socketstrat import SocketComsStrategy
 
 
 @pytest.mark.parametrize(
@@ -48,7 +49,7 @@ def test_write_read(msg_a, msg_b):
         with portcv:
             portcv.notify()
 
-        coms = SocketComsDriver.accept_connection_at("127.0.1.1", port)
+        coms = ComsDriver(SocketComsStrategy.accept_connection_at("127.0.1.1", port))
         coms.start_read_loop()
 
         with readcv:
@@ -63,12 +64,12 @@ def test_write_read(msg_a, msg_b):
         coms.write(msg_a)
 
         coms.end_read_loop()
-        coms._sock.close()
+        coms.strategy.sock.close()
 
     def _client():
         nonlocal client_read, ready_switcher
         time.sleep(0.3)
-        coms = SocketComsDriver.connect_to("127.0.1.1", port)
+        coms = ComsDriver(SocketComsStrategy.connect_to("127.0.1.1", port))
         coms.start_read_loop()
 
         with readcv:
@@ -84,8 +85,8 @@ def test_write_read(msg_a, msg_b):
         client_read = coms.read()
         coms.end_read_loop()
 
-        coms._sock.shutdown(socket.SHUT_RDWR)
-        coms._sock.close()
+        coms.strategy.sock.shutdown(socket.SHUT_RDWR)
+        coms.strategy.sock.close()
 
     # TODO: This threading can deadlock, doesn't happen for the most part so good
     # enough for now, but shouldn't deadlock in first place
@@ -119,4 +120,4 @@ def test_write_read(msg_a, msg_b):
 def test_error_when_cannot_connect():
     # this test will fail if something is running on 5000
     with pytest.raises(ConnectionRefusedError):
-        SocketComsDriver.connect_to("127.0.1.1", 5000)
+        SocketComsStrategy.connect_to("127.0.1.1", 5000)

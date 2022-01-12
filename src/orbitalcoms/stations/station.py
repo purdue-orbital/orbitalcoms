@@ -4,7 +4,7 @@ from abc import ABC, abstractmethod
 from typing import Any, Dict, Protocol
 
 from ..coms import (
-    BaseComsDriver,
+    ComsDriver,
     ComsMessage,
     ComsSubscription,
     ParsableComType,
@@ -13,7 +13,7 @@ from ..coms import (
 
 
 class Station(ABC):
-    def __init__(self, coms: BaseComsDriver):
+    def __init__(self, coms: ComsDriver):
         self._coms = coms
 
         self._last_sent: ComsMessage | None = None

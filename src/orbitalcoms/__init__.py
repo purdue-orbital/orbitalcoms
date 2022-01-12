@@ -1,14 +1,14 @@
 from .coms import (
-    BaseComsDriver,
+    ComsDriver,
     ComsDriverReadError,
     ComsDriverWriteError,
     ComsMessage,
     ComsMessageParseError,
     ComsSubscription,
-    LocalComsDriver,
+    LocalComsStrategy,
     OneTimeComsSubscription,
-    SerialComsDriver,
-    SocketComsDriver,
+    SerialComsStrategy,
+    SocketComsStrategy,
     construct_message,
 )
 from .stations import (
@@ -22,16 +22,16 @@ from .stations import (
 )
 
 __all__ = [
-    "BaseComsDriver",
+    "ComsDriver",
     "ComsDriverReadError",
     "ComsDriverWriteError",
     "ComsMessage",
     "ComsMessageParseError",
     "ComsSubscription",
-    "LocalComsDriver",
+    "LocalComsStrategy",
     "OneTimeComsSubscription",
-    "SerialComsDriver",
-    "SocketComsDriver",
+    "SerialComsStrategy",
+    "SocketComsStrategy",
     "construct_message",
     "GroundStation",
     "LaunchStation",

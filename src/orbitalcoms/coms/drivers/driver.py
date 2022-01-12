@@ -1,29 +1,32 @@
 from __future__ import annotations
 
-import multiprocessing as mp
-from abc import ABC, abstractmethod
-from multiprocessing.connection import Connection
-from threading import Condition, Event, Thread
-from typing import TYPE_CHECKING, Set, Tuple
+from threading import Condition
+from typing import TYPE_CHECKING, Set
 
 from ..errors import ComsDriverReadError, ComsDriverWriteError
 from ..messages import construct_message
 from ..subscribers import OneTimeComsSubscription
+from .driverreadloop import ComsDriverReadLoop
 
 if TYPE_CHECKING:
     from ..messages import ComsMessage, ParsableComType
+    from ..strategies import ComsStrategy
     from ..subscribers import ComsSubscriberLike
 
 
-class BaseComsDriver(ABC):
-    """Base Class for any Communication Strategies"""
+class ComsDriver:
+    """Drive Communication using a strategy"""
 
-    def __init__(self) -> None:
-        super().__init__()
+    def __init__(self, strategy: ComsStrategy) -> None:
         self.subscrbers: Set[ComsSubscriberLike] = set()
-        self._read_loop: ComsDriverReadLooop | None = None
+        self._read_loop: ComsDriverReadLoop | None = None
+        self._strategy = strategy
 
-    def start_read_loop(self, block: bool = False) -> ComsDriverReadLooop:
+    @property
+    def strategy(self) -> ComsStrategy:
+        return self._strategy
+
+    def start_read_loop(self, block: bool = False) -> ComsDriverReadLoop:
         if self._read_loop:
             self.end_read_loop()
         self._read_loop = self._spawn_read_loop_thread()
@@ -38,8 +41,8 @@ class BaseComsDriver(ABC):
                 self._read_loop.stop(timeout=timeout)
             self._read_loop = None
 
-    def _spawn_read_loop_thread(self) -> ComsDriverReadLooop:
-        return ComsDriverReadLooop(self, daemon=True)
+    def _spawn_read_loop_thread(self) -> ComsDriverReadLoop:
+        return ComsDriverReadLoop(self, daemon=True)
 
     @property
     def is_reading(self) -> bool:
@@ -62,22 +65,14 @@ class BaseComsDriver(ABC):
                 raise ComsDriverReadError("Failed to read next message")
         return message
 
-    @abstractmethod
-    def _read(self) -> ComsMessage:
-        ...
-
     def write(self, m: ParsableComType, suppress_errors: bool = False) -> bool:
         try:
-            self._write(construct_message(m))
+            self._strategy.write(construct_message(m))
             return True
         except Exception as e:
             if suppress_errors:
                 return False
             raise ComsDriverWriteError(f"Failed to send message '{m}'") from e
-
-    @abstractmethod
-    def _write(self, m: ComsMessage) -> None:
-        ...
 
     def register_subscriber(self, sub: ComsSubscriberLike) -> None:
         self.subscrbers.add(sub)
@@ -94,51 +89,3 @@ class BaseComsDriver(ABC):
                 # TODO: Add logging here
                 if not s.expect_err:
                     self.unregister_subscriber(s)
-
-
-class ComsDriverReadLooop(Thread):
-    def __init__(
-        self,
-        coms: BaseComsDriver,
-        name: str | None = None,
-        daemon: bool | None = None,
-    ) -> None:
-        super().__init__(name=name, daemon=daemon)
-        self._stop_event = Event()
-        self._coms = coms
-
-    def run(self) -> None:
-        proc, conn = self._spawn_get_msg_proc()
-        proc.start()
-
-        while not self._stop_event.is_set():
-            if not proc.is_alive():
-                recived = conn.recv()
-                if isinstance(recived, Exception):
-                    # TODO: Add logging
-                    ...
-                else:
-                    self._coms._notify_subscribers(recived)
-                proc, conn = self._spawn_get_msg_proc()
-                proc.start()
-            proc.join(timeout=1)
-
-        if proc.is_alive():
-            proc.terminate()
-
-    def _spawn_get_msg_proc(
-        self,
-    ) -> Tuple[mp.Process, Connection]:
-        a, b = mp.Pipe()
-
-        def get_msg(conn: Connection) -> None:
-            try:
-                conn.send(self._coms._read())
-            except Exception as e:
-                conn.send(e)
-
-        return mp.Process(target=get_msg, args=(a,), daemon=True), b
-
-    def stop(self, timeout: float | None = None) -> None:
-        self._stop_event.set()
-        self.join(timeout=timeout)

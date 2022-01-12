@@ -1,11 +1,10 @@
 import argparse
-from typing import TYPE_CHECKING, Protocol, cast
+from typing import Protocol, cast
 
 import orbitalcoms._app.tkgui as tkgui
-from orbitalcoms import GroundStation, SerialComsDriver, SocketComsDriver
-
-if TYPE_CHECKING:
-    from orbitalcoms import BaseComsDriver
+from orbitalcoms.coms.drivers import ComsDriver
+from orbitalcoms.coms.strategies import SerialComsStrategy, SocketComsStrategy
+from orbitalcoms.stations.groundstation import GroundStation
 
 
 class BaseArgs(Protocol):
@@ -27,12 +26,12 @@ def main() -> None:
     args = get_args()
     if args.connection == "socket":
         args = cast(SocketArgs, args)
-        coms: BaseComsDriver = SocketComsDriver.connect_to(
-            host=args.host, port=args.port
-        )
+        coms = ComsDriver(SocketComsStrategy.connect_to(host=args.host, port=args.port))
     elif args.connection == "serial":
         args = cast(SerialArgs, args)
-        coms = SerialComsDriver(port=args.port, baudrate=args.baudrate)
+        coms = ComsDriver(
+            SerialComsStrategy.from_args(port=args.port, baudrate=args.baudrate)
+        )
     else:
         raise ValueError("Could not determine how to manage communication")
 
