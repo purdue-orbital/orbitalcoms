@@ -4,15 +4,18 @@ from typing import Tuple
 
 import pytest
 
-from orbitalcoms.coms.drivers.localcomsdriver import LocalComsDriver
+from orbitalcoms.coms.drivers.basedriver import BaseComsDriver
 from orbitalcoms.coms.errors.errors import ComsDriverWriteError
 from orbitalcoms.coms.messages.message import ComsMessage
+from orbitalcoms.coms.strategies.localcomsstrategy import get_linked_local_strats
 from orbitalcoms.coms.subscribers.subscription import ComsSubscription
 
 
 @pytest.fixture
 def coms_drivers():
-    a, b = LocalComsDriver.create_linked_coms()
+    a_strat, b_strat = get_linked_local_strats()
+    a = BaseComsDriver(a_strat)
+    b = BaseComsDriver(b_strat)
     yield a, b
     a.end_read_loop()
     b.end_read_loop()
@@ -56,9 +59,7 @@ def coms_drivers():
         ),
     ],
 )
-def test_write_read(
-    coms_drivers: Tuple[LocalComsDriver, LocalComsDriver], msg_a, msg_b
-):
+def test_write_read(coms_drivers: Tuple[BaseComsDriver, BaseComsDriver], msg_a, msg_b):
     a, b = coms_drivers
 
     a_read = []

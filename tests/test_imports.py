@@ -6,7 +6,7 @@ def test_top_level_imports():
         ComsSubscription,
         GroundStation,
         LaunchStation,
-        LocalComsDriver,
+        LocalComsStrategy,
         OneTimeComsSubscription,
         SerialComsStrategy,
         SocketComsStrategy,

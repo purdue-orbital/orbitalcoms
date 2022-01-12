@@ -5,28 +5,7 @@ import time
 from typing import List, Set, Tuple
 
 from ..messages import ComsMessage, construct_message
-from ..strategies import ComsStrategy
-from .basedriver import BaseComsDriver
-
-
-class LocalComsDriver(BaseComsDriver):
-    """
-    Defined implimentation of BaseComsDriver for testing locally
-    """
-
-    def __init__(self, strategy: ComsStrategy | None = None) -> None:
-        if strategy:
-            super().__init__(strategy)
-        else:
-            super().__init__(LocalComsStrategy())
-
-    @classmethod
-    def create_linked_coms(cls) -> Tuple[LocalComsDriver, LocalComsDriver]:
-        # TODO: Remove
-        a = LocalComsStrategy()
-        b = LocalComsStrategy()
-        link_local_coms(a, b)
-        return LocalComsDriver(a), LocalComsDriver(b)
+from .strategy import ComsStrategy
 
 
 class LocalComsStrategy(ComsStrategy):
@@ -50,6 +29,11 @@ class LocalComsStrategy(ComsStrategy):
         com._listening.add(self)
 
 
-def link_local_coms(a: LocalComsStrategy, b: LocalComsStrategy) -> None:
+def get_linked_local_strats() -> Tuple[LocalComsStrategy, LocalComsStrategy]:
+    """Helper for testing"""
+    # NOTE: Do not export in __init__.py, just for tetsing
+    a = LocalComsStrategy()
+    b = LocalComsStrategy()
     a.listen_to(b)
     b.listen_to(a)
+    return a, b

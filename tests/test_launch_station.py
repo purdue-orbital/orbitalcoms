@@ -3,22 +3,25 @@ from typing import List, Tuple
 
 import pytest
 
-from orbitalcoms.coms.drivers.localcomsdriver import LocalComsDriver
+from orbitalcoms.coms.drivers.basedriver import BaseComsDriver
 from orbitalcoms.coms.messages.message import ComsMessage
+from orbitalcoms.coms.strategies.localcomsstrategy import get_linked_local_strats
 from orbitalcoms.coms.subscribers.subscription import ComsSubscription
 from orbitalcoms.stations.launchstation import LaunchStation
 
 
 @pytest.fixture
-def ls_and_loc() -> Tuple[LaunchStation, LocalComsDriver]:
-    a, b = LocalComsDriver.create_linked_coms()
+def ls_and_loc() -> Tuple[LaunchStation, BaseComsDriver]:
+    a_strat, b_strat = get_linked_local_strats()
+    a = BaseComsDriver(a_strat)
+    b = BaseComsDriver(b_strat)
     ls = LaunchStation(a)
     yield ls, b
     a.end_read_loop()
     b.end_read_loop()
 
 
-def test_all_fields_start_false(ls_and_loc: Tuple[LaunchStation, LocalComsDriver]):
+def test_all_fields_start_false(ls_and_loc: Tuple[LaunchStation, BaseComsDriver]):
     ls, _ = ls_and_loc
     assert ls.abort is False
     assert ls.qdm is False
@@ -28,7 +31,7 @@ def test_all_fields_start_false(ls_and_loc: Tuple[LaunchStation, LocalComsDriver
     assert ls.data is None
 
 
-def test_bind_queue(ls_and_loc: Tuple[LaunchStation, LocalComsDriver]):
+def test_bind_queue(ls_and_loc: Tuple[LaunchStation, BaseComsDriver]):
     ls, loc = ls_and_loc
     ls_read: List[ComsMessage] = []
     ls.bind_queue(ls_read)
@@ -63,7 +66,7 @@ def test_bind_queue(ls_and_loc: Tuple[LaunchStation, LocalComsDriver]):
         assert msg.DATA["msg"] == f"this is msg #{i+1}"
 
 
-def test_state_updated_on_read(ls_and_loc: Tuple[LaunchStation, LocalComsDriver]):
+def test_state_updated_on_read(ls_and_loc: Tuple[LaunchStation, BaseComsDriver]):
     ls, loc = ls_and_loc
     ls_read: List[ComsMessage] = []
     ls.bind_queue(ls_read)
@@ -85,7 +88,7 @@ def test_state_updated_on_read(ls_and_loc: Tuple[LaunchStation, LocalComsDriver]
     assert_state_updated(1, 1, 1, 1)
 
 
-def test_data_updated_on_send(ls_and_loc: Tuple[LaunchStation, LocalComsDriver]):
+def test_data_updated_on_send(ls_and_loc: Tuple[LaunchStation, BaseComsDriver]):
     ls, _ = ls_and_loc
 
     def send_msg(msg):
@@ -100,7 +103,7 @@ def test_data_updated_on_send(ls_and_loc: Tuple[LaunchStation, LocalComsDriver])
     assert ls.data["msg"] == ":)"
 
 
-def test_send_bad_msg_fails(ls_and_loc: Tuple[LaunchStation, LocalComsDriver]):
+def test_send_bad_msg_fails(ls_and_loc: Tuple[LaunchStation, BaseComsDriver]):
     ls, loc = ls_and_loc
     loc_read = []
     loc.register_subscriber(ComsSubscription(lambda m: loc_read.append(m)))
