@@ -2,8 +2,8 @@ from __future__ import annotations
 
 import serial
 
-from ..drivers.basedriver import ComsStrategy
 from ..messages import ComsMessage, construct_message
+from .strategy import ComsStrategy
 
 
 class SerialComsStrategy(ComsStrategy):

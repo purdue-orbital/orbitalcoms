@@ -2,9 +2,9 @@ from __future__ import annotations
 
 import socket
 
-from ..drivers.basedriver import ComsStrategy
 from ..errors.errors import ComsDriverReadError, ComsDriverWriteError
 from ..messages.message import ComsMessage, construct_message
+from .strategy import ComsStrategy
 
 
 class SocketComsStrategy(ComsStrategy):

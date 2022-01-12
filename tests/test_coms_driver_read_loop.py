@@ -1,6 +1,7 @@
 import time
 
-from orbitalcoms.coms.drivers.basedriver import BaseComsDriver, ComsDriverReadLooop
+from orbitalcoms.coms.drivers.basedriver import BaseComsDriver
+from orbitalcoms.coms.drivers.driverreadloop import ComsDriverReadLooop
 
 
 class WastTimeStrat:

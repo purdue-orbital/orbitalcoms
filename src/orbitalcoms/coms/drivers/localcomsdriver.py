@@ -5,7 +5,8 @@ import time
 from typing import List, Set, Tuple
 
 from ..messages import ComsMessage, construct_message
-from .basedriver import BaseComsDriver, ComsStrategy
+from ..strategies import ComsStrategy
+from .basedriver import BaseComsDriver
 
 
 class LocalComsDriver(BaseComsDriver):

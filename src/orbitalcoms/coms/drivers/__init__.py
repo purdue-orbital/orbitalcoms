@@ -1,4 +1,5 @@
-from .basedriver import BaseComsDriver, ComsDriverReadLooop
+from .basedriver import BaseComsDriver
+from .driverreadloop import ComsDriverReadLooop
 from .localcomsdriver import LocalComsDriver
 
 __all__ = [
