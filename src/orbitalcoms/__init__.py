@@ -1,3 +1,5 @@
+import sys
+
 from .coms import (
     ComsDriver,
     ComsDriverReadError,
@@ -20,6 +22,9 @@ from .stations import (
     create_socket_ground_station,
     create_socket_luanch_station,
 )
+
+if sys.version_info < (3, 7):
+    sys.exit("Python 3.7 or greater must be used with SmartSim.")
 
 __all__ = [
     "ComsDriver",
