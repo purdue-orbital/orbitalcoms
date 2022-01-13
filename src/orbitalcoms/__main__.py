@@ -1,5 +1,7 @@
 import argparse
-from typing import Protocol, cast
+from typing import cast
+
+from typing_extensions import Protocol
 
 import orbitalcoms._app.tkgui as tkgui
 from orbitalcoms.coms.drivers import ComsDriver

@@ -1,7 +1,9 @@
 from __future__ import annotations
 
 from abc import ABC, abstractmethod
-from typing import Any, Dict, Protocol
+from typing import Any, Dict
+
+from typing_extensions import Protocol
 
 from ..coms import (
     ComsDriver,

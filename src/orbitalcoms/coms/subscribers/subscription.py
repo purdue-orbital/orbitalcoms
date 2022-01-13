@@ -1,6 +1,8 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any, Callable, Protocol
+from typing import TYPE_CHECKING, Any, Callable
+
+from typing_extensions import Protocol
 
 if TYPE_CHECKING:
     from ..drivers import ComsDriver
