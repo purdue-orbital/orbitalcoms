@@ -42,14 +42,19 @@ class ComsDriverReadLoop(Thread):
     def _spawn_get_msg_proc(self) -> Tuple[mp.Process, Connection]:
         a, b = mp.Pipe()
 
-        def get_msg(conn: Connection) -> None:
-            try:
-                conn.send(self._coms.strategy.read())
-            except Exception as e:
-                conn.send(e)
-
-        return mp.Process(target=get_msg, args=(a,), daemon=True), b
+        return mp.Process(target=_get_msg, args=(self._coms.strategy, a), daemon=True), b
 
     def stop(self, timeout: float | None = None) -> None:
         self._stop_event.set()
         self.join(timeout=timeout)
+
+
+def _get_msg(strat, conn: Connection) -> None:
+    """Fucntion run to get recieve next message
+    NOTE: This function must by top level to work with
+    multiproccessing spawn strat on windows and macos
+    """
+    try:
+        conn.send(strat.read())
+    except Exception as e:
+        conn.send(e)
