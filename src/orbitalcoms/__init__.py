@@ -24,7 +24,7 @@ from .stations import (
 )
 
 if sys.version_info < (3, 7):
-    sys.exit("Python 3.7 or greater must be used with SmartSim.")
+    sys.exit("Python 3.7 or greater must be used with orbitalcoms.")
 
 __all__ = [
     "ComsDriver",
