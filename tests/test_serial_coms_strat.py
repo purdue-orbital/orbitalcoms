@@ -1,8 +1,17 @@
-import os
-import pty
-import time
+import sys
 
 import pytest
+
+# To the best of my knowledge pts do not work on windows
+# however that looks like it may change with py3.10
+# See here with more details: https://bugs.python.org/issue41663
+if sys.platform.startswith("win"):
+    pytestmark = pytest.mark.skip(reason="Psuedoterminals not supported on windows")
+else:
+    import pty
+
+import os
+import time
 
 from orbitalcoms.coms.drivers.driver import ComsDriver
 from orbitalcoms.coms.messages.message import ComsMessage, construct_message
