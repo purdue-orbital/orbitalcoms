@@ -1,4 +1,5 @@
 import sys
+
 import pytest
 
 # To the best of my knowledge pts do not work on windows

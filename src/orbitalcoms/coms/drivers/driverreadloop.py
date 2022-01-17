@@ -7,6 +7,7 @@ from typing import TYPE_CHECKING, Tuple
 
 if TYPE_CHECKING:
     from .driver import ComsDriver
+    from ..strategies.strategy import ComsStrategy
 
 
 class ComsDriverReadLoop(Thread):
@@ -42,14 +43,17 @@ class ComsDriverReadLoop(Thread):
     def _spawn_get_msg_proc(self) -> Tuple[mp.Process, Connection]:
         a, b = mp.Pipe()
 
-        return mp.Process(target=_get_msg, args=(self._coms.strategy, a), daemon=True), b
+        return (
+            mp.Process(target=_get_msg, args=(self._coms.strategy, a), daemon=True),
+            b,
+        )
 
     def stop(self, timeout: float | None = None) -> None:
         self._stop_event.set()
         self.join(timeout=timeout)
 
 
-def _get_msg(strat, conn: Connection) -> None:
+def _get_msg(strat: ComsStrategy, conn: Connection) -> None:
     """Fucntion run to get recieve next message
     NOTE: This function must by top level to work with
     multiproccessing spawn strat on windows and macos
