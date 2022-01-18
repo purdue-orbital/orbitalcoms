@@ -3,6 +3,7 @@ def test_top_level_imports():
     from orbitalcoms import (  # noqa: F401
         ComsDriver,
         ComsMessage,
+        ComsStrategy,
         ComsSubscription,
         GroundStation,
         LaunchStation,
