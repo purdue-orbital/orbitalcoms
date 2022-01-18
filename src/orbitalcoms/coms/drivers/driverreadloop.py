@@ -6,8 +6,8 @@ from threading import Event, Thread
 from typing import TYPE_CHECKING, Tuple
 
 if TYPE_CHECKING:
-    from .driver import ComsDriver
     from ..strategies.strategy import ComsStrategy
+    from .driver import ComsDriver
 
 
 class ComsDriverReadLoop(Thread):

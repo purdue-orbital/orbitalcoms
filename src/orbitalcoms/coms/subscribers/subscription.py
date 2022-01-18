@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from abc import abstractmethod
 from typing import TYPE_CHECKING, Any, Callable
 
 from typing_extensions import Protocol
@@ -12,6 +13,7 @@ if TYPE_CHECKING:
 class ComsSubscriberLike(Protocol):
     expect_err: bool
 
+    @abstractmethod
     def update(self, message: ComsMessage, driver: ComsDriver) -> Any:
         ...
 
