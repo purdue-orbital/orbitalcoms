@@ -21,7 +21,7 @@ from .stations import (
     create_serial_ground_station,
     create_serial_launch_station,
     create_socket_ground_station,
-    create_socket_luanch_station,
+    create_socket_launch_station,
 )
 
 if sys.version_info < (3, 7):
@@ -43,7 +43,7 @@ __all__ = [
     "GroundStation",
     "LaunchStation",
     "Station",
-    "create_socket_luanch_station",
+    "create_socket_launch_station",
     "create_socket_ground_station",
     "create_serial_ground_station",
     "create_serial_launch_station",

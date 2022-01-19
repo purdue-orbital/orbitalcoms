@@ -15,5 +15,5 @@ def test_top_level_imports():
         create_serial_ground_station,
         create_serial_launch_station,
         create_socket_ground_station,
-        create_socket_luanch_station,
+        create_socket_launch_station,
     )

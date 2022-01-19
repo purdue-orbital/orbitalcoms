@@ -9,7 +9,7 @@ from orbitalcoms import (
     ComsMessage,
     LaunchStation,
     create_serial_launch_station,
-    create_socket_luanch_station,
+    create_socket_launch_station,
 )
 
 
@@ -18,7 +18,7 @@ def main() -> int:
 
     if args.connection == "socket":
         print(f"HOST: {args.host} | PORT: {args.port}")
-        ls = create_socket_luanch_station(args.host, args.port)
+        ls = create_socket_launch_station(args.host, args.port)
         print("Connect to Ground Station")
     elif args.connection == "serial":
         print(f"PORT: {args.port} | BAUDRATE: {args.baudrate}")

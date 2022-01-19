@@ -5,7 +5,7 @@ from .stationcreators import (
     create_serial_ground_station,
     create_serial_launch_station,
     create_socket_ground_station,
-    create_socket_luanch_station,
+    create_socket_launch_station,
 )
 
 __all__ = [
@@ -16,5 +16,5 @@ __all__ = [
     "create_serial_ground_station",
     "create_serial_launch_station",
     "create_socket_ground_station",
-    "create_socket_luanch_station",
+    "create_socket_launch_station",
 ]
