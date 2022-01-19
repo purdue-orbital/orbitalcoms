@@ -8,7 +8,7 @@ from .groundstation import GroundStation
 from .launchstation import LaunchStation
 
 
-def create_socket_luanch_station(
+def create_socket_launch_station(
     host: str = "127.0.1.1", port: int = 5000
 ) -> LaunchStation:
     """Convinence function for creating a Launch Station
