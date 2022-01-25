@@ -1,6 +1,9 @@
 from __future__ import annotations
 
-import dataclasses
+#import dataclasses
+from attrs import define
+from attrs import frozen
+from attrs import asdict
 import json
 from dataclasses import dataclass
 from typing import Any, Dict, Union
@@ -8,7 +11,8 @@ from typing import Any, Dict, Union
 from ..errors.errors import ComsMessageParseError
 
 
-@dataclass(frozen=True)
+#@dataclass(frozen=True)
+@define(frozen=True)
 class ComsMessage:
     """Message Specs to be sent by Coms"""
 
@@ -28,7 +32,8 @@ class ComsMessage:
 
     @property
     def as_dict(self) -> Dict[str, Any]:
-        return dataclasses.asdict(self)
+        #return dataclasses.asdict(self)
+        return asdict(self)
 
     @property
     def as_str(self) -> str:

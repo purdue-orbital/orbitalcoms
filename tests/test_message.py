@@ -4,6 +4,8 @@ import pytest
 
 from orbitalcoms.coms.messages.message import ComsMessage
 
+from attrs import exceptions
+
 
 def test_construction():
     m = ComsMessage(ABORT=1, LAUNCH=0, STAB=0, QDM=1)
@@ -29,7 +31,7 @@ def test_optional_params_construction():
 
 
 def test_message_is_frozen():
-    with pytest.raises(dataclasses.FrozenInstanceError):
+    with pytest.raises(exceptions.FrozenInstanceError):
         ComsMessage(ABORT=1, LAUNCH=0, STAB=0, QDM=1).ABORT = 0
 
 
