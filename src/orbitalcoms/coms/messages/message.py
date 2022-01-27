@@ -1,9 +1,8 @@
 from __future__ import annotations
+from xmlrpc.client import Boolean
 
 #import dataclasses
-from attrs import define
-from attrs import frozen
-from attrs import asdict
+from attrs import define, frozen, asdict, validators, field
 import json
 from dataclasses import dataclass
 from typing import Any, Dict, Union
@@ -16,13 +15,36 @@ from ..errors.errors import ComsMessageParseError
 class ComsMessage:
     """Message Specs to be sent by Coms"""
 
-    ABORT: int
-    QDM: int
-    STAB: int
-    LAUNCH: int
+    ABORT: int = field()
+    QDM: int = field()
+    STAB: int = field()
+    LAUNCH: int = field()
     ARMED: int | None = None
     DATA: Dict[str, Any] | None = None
+    
+    # TODO: ARMED and DATA are not validated.
+    # TODO: I don't think any tests currently exist to test the following validators.
 
+    @ABORT.validator
+    def check(self, attribute, value):
+        if not (type(self.ABORT) == Boolean or type(self.ABORT) == int):
+            raise TypeError("ABORT must be either a Boolean or an int")
+    
+    @QDM.validator
+    def check(self, attribute, value):
+        if not (type(self.QDM) == Boolean or type(self.QDM) == int):
+            raise TypeError("QDM must be either a Boolean or an int")
+    
+    @STAB.validator
+    def check(self, attribute, value):
+        if not (type(self.STAB) == Boolean or type(self.STAB) == int):
+            raise TypeError("STAB must be either a Boolean or an int")
+    
+    @LAUNCH.validator
+    def check(self, attribute, value):
+        if not (type(self.LAUNCH) == Boolean or type(self.LAUNCH) == int):
+            raise TypeError("LAUNCH must be either a Boolean or an int")
+    
     @classmethod
     def from_string(cls, s: str) -> ComsMessage:
         return cls(**json.loads(s))
