@@ -66,10 +66,33 @@ def test_construct_from_dict():
 
 
 def test_cannot_parse_dict():
-    with pytest.raises(ComsMessageParseError):
+    with pytest.raises(TypeError):
         construct_message({"Error": "This is not a valid dict"})
+
+
+def test_accepts_int_type():
+    construct_message({"ABORT": 1, "LAUNCH": 0, "STAB": 0, "QDM": 1})
+
+
+def test_accepts_boolean_type():
+    m = construct_message({"ABORT": True, "LAUNCH": False, "STAB": False, "QDM": True})
+
+    assert m.ABORT == 1
+    assert m.LAUNCH == 0
+    assert m.STAB == 0
+    assert m.QDM == 1
 
 
 def test_error_on_invalid_type():
     with pytest.raises(TypeError):
-        construct_message([1, 0, 0, 1])
+        construct_message({"ABORT": "t", "LAUNCH": "f", "STAB": "f", "QDM": "t"})
+
+
+def test_error_on_invalid_arm_option():
+    with pytest.raises(TypeError):
+        construct_message({"ABORT": 1, "LAUNCH": 0, "STAB": 0, "QDM": 1, "ARMED": "t"})
+
+
+def test_error_on_invalid_data_option():
+    with pytest.raises(TypeError):
+        construct_message({"ABORT": 1, "LAUNCH": 0, "STAB": 0, "QDM": 1, "DATA": 0})
