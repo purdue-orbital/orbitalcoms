@@ -2,7 +2,6 @@ from __future__ import annotations
 
 import json
 from typing import Any, Dict, Union
-from xmlrpc.client import Boolean
 
 # import dataclasses
 from attrs import asdict, define, field
@@ -10,56 +9,31 @@ from attrs import asdict, define, field
 from ..errors.errors import ComsMessageParseError
 
 
+def _intbool_to_int(val: int | bool):
+    # not sure why it doesn't work when under the ComsMessage class
+    if isinstance(val, (int, bool)):
+        return int(val)
+    raise TypeError("Value is not a valid type! (Expected int or bool)")
+
+
+def _armed_intbool_to_int(val: int | bool | None):
+    if val is not None:
+        if isinstance(val, (int, bool)):
+            return int(val)
+        raise TypeError("Value is not a valid type! (Expected int or bool)")
+
+
 # @dataclass(frozen=True)
 @define(frozen=True)
 class ComsMessage:
     """Message Specs to be sent by Coms"""
 
-    ABORT: int = field()
-    QDM: int = field()
-    STAB: int = field()
-    LAUNCH: int = field()
-    ARMED: int | None = field(default=None)
+    ABORT: int = field(converter=_intbool_to_int)
+    QDM: int = field(converter=_intbool_to_int)
+    STAB: int = field(converter=_intbool_to_int)
+    LAUNCH: int = field(converter=_intbool_to_int)
+    ARMED: int | None = field(default=None, converter=_armed_intbool_to_int)
     DATA: Dict[str, Any] | None = field(default=None)
-
-    # TODO: resolve booleans to int, rather than simply accepting them
-
-    @ABORT.validator
-    def check_abort(self, attribute: str, value: Any) -> None:
-        if not (type(self.ABORT) == Boolean or type(self.ABORT) == int):
-            raise TypeError("ABORT must be either a Boolean or an int")
-        # if (type(self.ABORT) == Boolean):
-        #    self.ABORT = 1
-
-    @QDM.validator
-    def check_qdm(self, attribute: str, value: Any) -> None:
-        if not (type(self.QDM) == Boolean or type(self.QDM) == int):
-            raise TypeError("QDM must be either a Boolean or an int")
-        # if (type(self.QDM) == Boolean):
-        #    self.QDM = 1
-
-    @STAB.validator
-    def check_stab(self, attribute: str, value: Any) -> None:
-        if not (type(self.STAB) == Boolean or type(self.STAB) == int):
-            raise TypeError("STAB must be either a Boolean or an int")
-        # if (type(self.STAB) == Boolean):
-        #    self.STAB = 1
-
-    @LAUNCH.validator
-    def check_launch(self, attribute: str, value: Any) -> None:
-        if not (type(self.LAUNCH) == Boolean or type(self.LAUNCH) == int):
-            raise TypeError("LAUNCH must be either a Boolean or an int")
-        # if (type(self.LAUNCH) == Boolean):
-        #    self.LAUNCH = 1
-
-    @ARMED.validator
-    def check_armed(self, attribute: str, value: Any) -> None:
-        if not (
-            type(self.ARMED) == Boolean or type(self.ARMED) == int or self.ARMED is None
-        ):
-            raise TypeError("ARMED must be either a Boolean, an int, or None")
-        # if (type(self.ARMED) == Boolean):
-        #    self.ARMED = 1
 
     @DATA.validator
     def check_data(self, attribute: str, value: Any) -> None:
