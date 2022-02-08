@@ -1,10 +1,7 @@
-import dataclasses
-
 import pytest
+from attrs import exceptions
 
 from orbitalcoms.coms.messages.message import ComsMessage
-
-from attrs import exceptions
 
 
 def test_construction():

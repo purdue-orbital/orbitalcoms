@@ -1,4 +1,3 @@
-from typing import Type
 import pytest
 
 from orbitalcoms.coms.errors.errors import ComsMessageParseError
