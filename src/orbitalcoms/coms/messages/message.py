@@ -9,18 +9,17 @@ from attrs import asdict, define, field
 from ..errors.errors import ComsMessageParseError
 
 
-def _intbool_to_int(val: int | bool):
+def _intbool_to_int(val: int | bool) -> int:
     # not sure why it doesn't work when under the ComsMessage class
     if isinstance(val, (int, bool)):
         return int(val)
     raise TypeError("Value is not a valid type! (Expected int or bool)")
 
 
-def _armed_intbool_to_int(val: int | bool | None):
+def _armed_intbool_to_int(val: int | bool | None) -> int | None:
     if val is not None:
-        if isinstance(val, (int, bool)):
-            return int(val)
-        raise TypeError("Value is not a valid type! (Expected int or bool)")
+        return _intbool_to_int(val)
+    return None
 
 
 # @dataclass(frozen=True)
