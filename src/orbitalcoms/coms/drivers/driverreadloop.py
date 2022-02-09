@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import logging
+from ....orbitalcoms import _util
 import multiprocessing as mp
 from multiprocessing.connection import Connection
 from threading import Event, Thread
@@ -9,6 +11,7 @@ if TYPE_CHECKING:
     from ..strategies.strategy import ComsStrategy
     from .driver import ComsDriver
 
+logger = _util.make_logger(__name__, logging.ERROR)
 
 class ComsDriverReadLoop(Thread):
     def __init__(
@@ -27,12 +30,11 @@ class ComsDriverReadLoop(Thread):
 
         while not self._stop_event.is_set():
             if not proc.is_alive():
-                recived = conn.recv()
-                if isinstance(recived, Exception):
-                    # TODO: Add logging
-                    ...
+                received = conn.recv()
+                if isinstance(received, Exception):
+                    logger.error(f"received exception: {received}")
                 else:
-                    self._coms._notify_subscribers(recived)
+                    self._coms._notify_subscribers(received)
                 proc, conn = self._spawn_get_msg_proc()
                 proc.start()
             proc.join(timeout=1)

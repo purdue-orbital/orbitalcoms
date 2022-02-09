@@ -1,5 +1,8 @@
 from __future__ import annotations
 
+import logging
+from ....orbitalcoms import _util
+
 from threading import Condition
 from typing import TYPE_CHECKING, Set
 
@@ -13,6 +16,7 @@ if TYPE_CHECKING:
     from ..strategies import ComsStrategy
     from ..subscribers import ComsSubscriberLike
 
+logger = _util.make_logger(__name__, logging.ERROR)
 
 class ComsDriver:
     """Drive Communication using a strategy"""
@@ -85,7 +89,7 @@ class ComsDriver:
         for s in self.subscrbers.copy():
             try:
                 s.update(m, self)
-            except Exception:
-                # TODO: Add logging here
+            except Exception as e:
+                logger.error(f"subscriber through exception: {e}")
                 if not s.expect_err:
                     self.unregister_subscriber(s)
