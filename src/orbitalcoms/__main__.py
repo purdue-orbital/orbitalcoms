@@ -3,8 +3,8 @@ from typing import cast
 
 from typing_extensions import Protocol
 
-import orbitalcoms._app.tkgui as tkgui
 import orbitalcoms._app.headless as headles
+import orbitalcoms._app.tkgui as tkgui
 from orbitalcoms.coms.drivers import ComsDriver
 from orbitalcoms.coms.strategies import SerialComsStrategy, SocketComsStrategy
 from orbitalcoms.stations.groundstation import GroundStation

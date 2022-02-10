@@ -3,6 +3,7 @@ in a purely terminal based enviornment
 """
 
 from __future__ import annotations
+
 from typing import TYPE_CHECKING
 
 from pynput import keyboard
@@ -30,28 +31,73 @@ class GSKeyboardControl:
             return False
         if isinstance(key, KeyCode):
             if key.char == "a":
-                m = messages.construct_message({"ABORT": not self._gs.abort, "QDM": self._gs.qdm, "STAB": self._gs.stab, "LAUNCH": self._gs.launch, "ARMED": self._gs.armed, "DATA": self._gs.data})
+                m = messages.construct_message(
+                    {
+                        "ABORT": not self._gs.abort,
+                        "QDM": self._gs.qdm,
+                        "STAB": self._gs.stab,
+                        "LAUNCH": self._gs.launch,
+                        "ARMED": self._gs.armed,
+                        "DATA": self._gs.data,
+                    }
+                )
                 self._gs.send(m)
                 return True
             if key.char == "l":
-                m = messages.construct_message({"ABORT": self._gs.abort, "QDM": self._gs.qdm, "STAB": self._gs.stab, "LAUNCH": not self._gs.launch, "ARMED": self._gs.armed, "DATA": self._gs.data})
+                m = messages.construct_message(
+                    {
+                        "ABORT": self._gs.abort,
+                        "QDM": self._gs.qdm,
+                        "STAB": self._gs.stab,
+                        "LAUNCH": not self._gs.launch,
+                        "ARMED": self._gs.armed,
+                        "DATA": self._gs.data,
+                    }
+                )
                 self._gs.send(m)
                 return True
             if key.char == "q":
-                m = messages.construct_message({"ABORT": self._gs.abort, "QDM": not self._gs.qdm, "STAB": self._gs.stab, "LAUNCH": self._gs.launch, "ARMED": self._gs.armed, "DATA": self._gs.data})
+                m = messages.construct_message(
+                    {
+                        "ABORT": self._gs.abort,
+                        "QDM": not self._gs.qdm,
+                        "STAB": self._gs.stab,
+                        "LAUNCH": self._gs.launch,
+                        "ARMED": self._gs.armed,
+                        "DATA": self._gs.data,
+                    }
+                )
                 self._gs.send(m)
                 return True
             if key.char == "r":
-                m = messages.construct_message({"ABORT": self._gs.abort, "QDM": self._gs.qdm, "STAB": self._gs.stab, "LAUNCH": self._gs.launch, "ARMED": not self._gs.armed, "DATA": self._gs.data})
+                m = messages.construct_message(
+                    {
+                        "ABORT": self._gs.abort,
+                        "QDM": self._gs.qdm,
+                        "STAB": self._gs.stab,
+                        "LAUNCH": self._gs.launch,
+                        "ARMED": not self._gs.armed,
+                        "DATA": self._gs.data,
+                    }
+                )
                 self._gs.send(m)
                 return True
             if key.char == "s":
-                m = messages.construct_message({"ABORT": self._gs.abort, "QDM": self._gs.qdm, "STAB": not self._gs.stab, "LAUNCH": self._gs.launch, "ARMED": self._gs.armed, "DATA": self._gs.data})
+                m = messages.construct_message(
+                    {
+                        "ABORT": self._gs.abort,
+                        "QDM": self._gs.qdm,
+                        "STAB": not self._gs.stab,
+                        "LAUNCH": self._gs.launch,
+                        "ARMED": self._gs.armed,
+                        "DATA": self._gs.data,
+                    }
+                )
                 self._gs.send(m)
                 return True
         print(f"Unhandled Input Key: {key}")
         return True
-    
+
     class DisplayUpdater:
         def append(self, m: ComsMessage) -> None:
             print(
