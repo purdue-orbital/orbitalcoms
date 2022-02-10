@@ -8,6 +8,8 @@ from typing import TYPE_CHECKING
 from pynput import keyboard
 from pynput.keyboard import Key, KeyCode
 
+from orbitalcoms.coms.messages.message import ComsMessage
+
 from ..coms import messages
 
 if TYPE_CHECKING:
@@ -17,6 +19,7 @@ if TYPE_CHECKING:
 class GSKeyboardControl:
     def __init__(self, gs: GroundStation) -> None:
         self._gs = gs
+        self._gs.bind_queue(GSKeyboardControl.DisplayUpdater())
 
     def on_press(self, key: KeyCode | Key | None) -> bool:
         return True
@@ -48,6 +51,22 @@ class GSKeyboardControl:
                 return True
         print(f"Unhandled Input Key: {key}")
         return True
+    
+    class DisplayUpdater:
+        def append(self, m: ComsMessage) -> None:
+            print(
+                (
+                    "===============================\n"
+                    "Received New Message:\n"
+                    "===============================\n"
+                    f"ARMED:  {m.ARMED}\n"
+                    f"ABORT:  {m.ABORT}\n"
+                    f"QDM:    {m.QDM}\n"
+                    f"STAB:   {m.STAB}\n"
+                    f"LAUNCH: {m.LAUNCH}\n"
+                    "===============================\n"
+                )
+            )
 
 
 def run_app(gs: GroundStation) -> None:
