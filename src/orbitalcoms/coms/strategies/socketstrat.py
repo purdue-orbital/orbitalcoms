@@ -33,7 +33,7 @@ class SocketComsStrategy(ComsStrategy):
     def read(self) -> ComsMessage:
         head = self.sock.recv(self.__HEADER).decode(encoding=self.__ENCODING)
         if not head:
-            raise ComsDriverReadError(f"Invalid header recieved: '{head}'")
+            raise ComsDriverReadError(f"Invalid header received: '{head}'")
         return construct_message(
             self.sock.recv(int(head)).decode(encoding=self.__ENCODING)
         )

@@ -104,7 +104,7 @@ class GroundStationFrame(tk.Frame):
         self.txt_sent.insert(1.0, coms_msg_txt_fomat(self._gs.last_sent, "SENT"))
 
         self.txt_recv.delete(1.0, "end")
-        self.txt_recv.insert(1.0, coms_msg_txt_fomat(self._gs.last_recieved, "RECV"))
+        self.txt_recv.insert(1.0, coms_msg_txt_fomat(self._gs.last_received, "RECV"))
 
         self.txt_data.delete(1.0, "end")
         try:

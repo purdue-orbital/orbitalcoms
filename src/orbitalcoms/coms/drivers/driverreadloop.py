@@ -54,7 +54,7 @@ class ComsDriverReadLoop(Thread):
 
 
 def _get_msg(strat: ComsStrategy, conn: Connection) -> None:
-    """Fucntion run to get recieve next message
+    """Fucntion run to get receive next message
     NOTE: This function must by top level to work with
     multiproccessing spawn strat on windows and macos
     """
