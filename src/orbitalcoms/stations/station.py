@@ -75,25 +75,6 @@ class Station(ABC):
 
     def _on_send(self, new: ComsMessage) -> Any:
         ...
-    
-    def _is_valid_state_change(self, new: ComsMessage) -> bool:
-        if self._last_sent is not None:
-            if self.abort != new.ABORT:
-                return self.armed and not self.abort
-            elif self.armed != new.ARMED:
-                return not self.armed
-            elif self.launch != new.LAUNCH:
-                return self.armed and not self.abort and not self.qdm and not self.launch and self.stab
-            elif self.qdm != new.QDM:
-                return self.armed and not self.qdm
-            elif self.stab != new.STAB:
-                return self.armed
-            else:
-                # should never trigger
-                print("...How did you get here?")
-                raise ValueError
-        else:
-            return new.ARMED
 
     def send(self, data: ParsableComType) -> bool:
         try:
