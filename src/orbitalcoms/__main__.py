@@ -48,14 +48,14 @@ def get_args() -> BaseArgs:
     parser.add_argument(
         "--frontend",
         "-f",
-        help="The forntend used for to dispaling groundsationinformation",
+        help="The frontend used for to dispaling ground sation information",
         default="dev",
         type=str,
     )
     subparsers = parser.add_subparsers(
         title="Connection",
         dest="connection",
-        description="Determines the comunications strategy used by the Mock Launch Station",
+        description="Determines the communications strategy used by the ground station",
         required=True,
         help="Available connection types",
     )
@@ -78,7 +78,7 @@ def get_args() -> BaseArgs:
     serial.add_argument(
         "--port",
         "-p",
-        help="Serial port to send data to",
+        help="Serial port to use",
         default="/dev/ttyUSB0",
         type=str,
     )

@@ -19,18 +19,18 @@ class Station(ABC):
         self._coms = coms
 
         self._last_sent: ComsMessage | None = None
-        self._last_recieved: ComsMessage | None = None
+        self._last_received: ComsMessage | None = None
         self._last_data: Dict[str, Any] | None = None
 
         self.queue: Queueable | None = None
 
-        def recieve(message: ComsMessage) -> None:
+        def receive(message: ComsMessage) -> None:
             self._on_receive(message)
-            self._last_recieved = message
+            self._last_received = message
             if self.queue is not None:
                 self.queue.append(message)
 
-        self._coms.register_subscriber(ComsSubscription(recieve))
+        self._coms.register_subscriber(ComsSubscription(receive))
         self._coms.start_read_loop()
 
     @property
@@ -67,8 +67,8 @@ class Station(ABC):
         return self._last_sent
 
     @property
-    def last_recieved(self) -> ComsMessage | None:
-        return self._last_recieved
+    def last_received(self) -> ComsMessage | None:
+        return self._last_received
 
     def _on_receive(self, new: ComsMessage) -> Any:
         ...
