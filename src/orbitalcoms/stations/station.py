@@ -5,8 +5,6 @@ from typing import Any, Dict
 
 from typing_extensions import Protocol
 
-from orbitalcoms import ComsMessageParseError
-
 from ..coms import (
     ComsDriver,
     ComsMessage,
@@ -81,9 +79,7 @@ class Station(ABC):
     def send(self, data: ParsableComType) -> bool:
         try:
             message = construct_message(data)
-            # if not self._is_valid_state_change(message):
-            #     return False
-        except (TypeError, ComsMessageParseError):
+        except Exception:
             return False
         if self._coms.write(message, suppress_errors=True):
             self._on_send(message)

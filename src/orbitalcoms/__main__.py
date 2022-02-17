@@ -3,7 +3,6 @@ from typing import cast
 
 from typing_extensions import Protocol
 
-import orbitalcoms._app.headless as headless
 import orbitalcoms._app.tkgui as tkgui
 from orbitalcoms.coms.drivers import ComsDriver
 from orbitalcoms.coms.strategies import SerialComsStrategy, SocketComsStrategy
@@ -40,8 +39,6 @@ def main() -> None:
 
     if args.frontend == "dev":
         tkgui.run_app(GroundStation(coms))
-    elif args.frontend == "headless":
-        headless.run_app(GroundStation(coms))
     else:
         raise ValueError("Failed to find selected frontend")
 
