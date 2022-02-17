@@ -1,7 +1,8 @@
 from __future__ import annotations
 
 from abc import ABC, abstractmethod
-from typing import Any, Dict
+from inspect import Traceback
+from typing import Any, Dict, Type
 
 from typing_extensions import Protocol
 
@@ -32,6 +33,23 @@ class Station(ABC):
 
         self._coms.register_subscriber(ComsSubscription(receive))
         self._coms.start_read_loop()
+
+    def __enter__(self) -> Station:
+        return self
+
+    def __exit__(
+        self,
+        exc_type: Type[Exception],
+        exc_value: Exception,
+        tb: Traceback,
+    ) -> None:
+        self.__cleanup()
+
+    def __del__(self) -> None:
+        self.__cleanup()
+
+    def __cleanup(self) -> None:
+        self._coms.end_read_loop()
 
     @property
     @abstractmethod

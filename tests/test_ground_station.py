@@ -1,11 +1,15 @@
 import threading as th
+import time
 from typing import List, Tuple
 
 import pytest
 
 from orbitalcoms.coms.drivers.driver import ComsDriver
 from orbitalcoms.coms.messages.message import ComsMessage
-from orbitalcoms.coms.strategies.localstrat import get_linked_local_strats
+from orbitalcoms.coms.strategies.localstrat import (
+    LocalComsStrategy,
+    get_linked_local_strats,
+)
 from orbitalcoms.coms.subscribers.subscription import ComsSubscription
 from orbitalcoms.stations.groundstation import GroundStation
 
@@ -130,3 +134,11 @@ def test_station_does_not_unarm(gs_and_loc: Tuple[GroundStation, ComsDriver]):
     with pytest.raises(Exception):  # TODO: tighter exception needed
         gs.send(ComsMessage(0, 0, 0, 0, ARMED=1, DATA={"key1": 1}))
         gs.send(ComsMessage(0, 0, 0, 0, ARMED=0, DATA={"key2": 2}))
+
+
+def test_clean_up_on_end_ctx():
+    starting_num_threads = th.active_count()
+    with GroundStation(ComsDriver(LocalComsStrategy())):
+        time.sleep(1)
+        assert th.active_count() == starting_num_threads + 1
+    assert th.active_count() == starting_num_threads
