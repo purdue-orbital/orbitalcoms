@@ -97,6 +97,7 @@ def test_data_updated_on_send(ls_and_loc: Tuple[LaunchStation, ComsDriver]):
 
     def send_msg(msg):
         ls.send(ComsMessage(0, 0, 0, 0, ARMED=1, DATA={"msg": msg}))
+        assert ls.data is not None
         assert ls.data["msg"] == msg
 
     send_msg("Sending the first set of data")

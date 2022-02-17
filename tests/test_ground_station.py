@@ -70,7 +70,7 @@ def test_bind_queue(gs_and_loc: Tuple[GroundStation, ComsDriver]):
         assert msg.DATA["msg"] == f"this is msg #{i+1}"
 
 
-def test_state_mataches_sent(gs_and_loc: Tuple[GroundStation, ComsDriver]):
+def test_state_matches_sent(gs_and_loc: Tuple[GroundStation, ComsDriver]):
     gs, _ = gs_and_loc
 
     def send_msg(a, q, s, ln):
@@ -81,10 +81,10 @@ def test_state_mataches_sent(gs_and_loc: Tuple[GroundStation, ComsDriver]):
         assert gs.stab == gs.getStabFlag() == bool(s)
         assert gs.armed == gs.getArmedFlag() and gs.armed is True
 
+    send_msg(0, 0, 0, 0)
     send_msg(0, 0, 1, 0)
     send_msg(0, 0, 1, 1)
-    send_msg(1, 0, 1, 1)
-    send_msg(1, 1, 1, 1)
+    send_msg(0, 1, 1, 1)
 
 
 def test_data_matches_last_recv(gs_and_loc: Tuple[GroundStation, ComsDriver]):
