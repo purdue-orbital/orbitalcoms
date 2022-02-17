@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from abc import ABC, abstractmethod
-from inspect import Traceback
+from types import TracebackType
 from typing import Any, Dict, Type
 
 from typing_extensions import Protocol
@@ -41,9 +41,9 @@ class Station(ABC):
 
     def __exit__(
         self,
-        exc_type: Type[Exception],
-        exc_value: Exception,
-        tb: Traceback,
+        exc_type: Type[BaseException] | None,
+        exc_value: BaseException | None,
+        tb: TracebackType | None,
     ) -> None:
         self.__cleanup()
 
