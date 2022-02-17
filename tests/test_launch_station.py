@@ -1,11 +1,15 @@
 import threading as th
+import time
 from typing import List, Tuple
 
 import pytest
 
 from orbitalcoms.coms.drivers.driver import ComsDriver
 from orbitalcoms.coms.messages.message import ComsMessage
-from orbitalcoms.coms.strategies.localstrat import get_linked_local_strats
+from orbitalcoms.coms.strategies.localstrat import (
+    LocalComsStrategy,
+    get_linked_local_strats,
+)
 from orbitalcoms.coms.subscribers.subscription import ComsSubscription
 from orbitalcoms.stations.launchstation import LaunchStation
 
@@ -111,3 +115,11 @@ def test_send_bad_msg_fails(ls_and_loc: Tuple[LaunchStation, ComsDriver]):
     loc.start_read_loop()
     assert ls.send("Do not send this!") is False
     assert len(loc_read) == 0
+
+
+def test_clean_up_on_end_ctx():
+    starting_num_threads = th.active_count()
+    with LaunchStation(ComsDriver(LocalComsStrategy())):
+        time.sleep(1)
+        assert th.active_count() == starting_num_threads + 1
+    assert th.active_count() == starting_num_threads
