@@ -109,11 +109,11 @@ class Station(ABC):
             return True
         return False
 
-    def bind_queue(self, queue: Queueable) -> None:
+    def bind_queue(self, queue: Queueable | None) -> None:
         """Alias for bindQueue"""
         return self.bindQueue(queue)
 
-    def bindQueue(self, queue: Queueable) -> None:
+    def bindQueue(self, queue: Queueable | None) -> None:
         """Supply a queue reference for data placement"""
         self.queue = queue
 
