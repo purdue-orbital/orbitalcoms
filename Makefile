@@ -22,6 +22,11 @@ clean-cov:
 	@rm -f .coverage*
 
 
+.PHONY: clobber
+clobber: clean
+	@find . | grep -E "\.egg-info$$" | xargs rm -rf
+
+
 .PHONY: dev
 dev:
 	${PIP} install -e .[dev]
