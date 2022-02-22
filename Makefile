@@ -1,5 +1,5 @@
 PY = python3
-PIP = pip3
+PIP = pip3 --require-virtualenv
 
 ifndef COV_FILE
 export COV_FILE="${PWD}/tests/test_configs/cov/coverage.cfg"
@@ -20,6 +20,11 @@ clean: clean-cov
 .PHONY: clean-cov
 clean-cov:
 	@rm -f .coverage*
+
+
+.PHONY: clobber
+clobber: clean
+	@find . | grep -E "\.egg-info$$" | xargs rm -rf
 
 
 .PHONY: dev

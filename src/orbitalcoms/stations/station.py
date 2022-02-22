@@ -1,9 +1,12 @@
 from __future__ import annotations
 
 from abc import ABC, abstractmethod
-from typing import Any, Dict
+from types import TracebackType
+from typing import Any, Dict, Type
 
 from typing_extensions import Protocol
+
+from orbitalcoms import ComsMessageParseError
 
 from ..coms import (
     ComsDriver,
@@ -19,19 +22,36 @@ class Station(ABC):
         self._coms = coms
 
         self._last_sent: ComsMessage | None = None
-        self._last_recieved: ComsMessage | None = None
+        self._last_received: ComsMessage | None = None
         self._last_data: Dict[str, Any] | None = None
 
         self.queue: Queueable | None = None
 
-        def recieve(message: ComsMessage) -> None:
+        def receive(message: ComsMessage) -> None:
             self._on_receive(message)
-            self._last_recieved = message
+            self._last_received = message
             if self.queue is not None:
                 self.queue.append(message)
 
-        self._coms.register_subscriber(ComsSubscription(recieve))
+        self._coms.register_subscriber(ComsSubscription(receive))
         self._coms.start_read_loop()
+
+    def __enter__(self) -> Station:
+        return self
+
+    def __exit__(
+        self,
+        exc_type: Type[BaseException] | None,
+        exc_value: BaseException | None,
+        tb: TracebackType | None,
+    ) -> None:
+        self.__cleanup()
+
+    def __del__(self) -> None:
+        self.__cleanup()
+
+    def __cleanup(self) -> None:
+        self._coms.end_read_loop()
 
     @property
     @abstractmethod
@@ -67,8 +87,8 @@ class Station(ABC):
         return self._last_sent
 
     @property
-    def last_recieved(self) -> ComsMessage | None:
-        return self._last_recieved
+    def last_received(self) -> ComsMessage | None:
+        return self._last_received
 
     def _on_receive(self, new: ComsMessage) -> Any:
         ...
@@ -79,7 +99,9 @@ class Station(ABC):
     def send(self, data: ParsableComType) -> bool:
         try:
             message = construct_message(data)
-        except Exception:
+            # if not self._is_valid_state_change(message):
+            #     return False
+        except (TypeError, ComsMessageParseError):
             return False
         if self._coms.write(message, suppress_errors=True):
             self._on_send(message)
@@ -87,11 +109,11 @@ class Station(ABC):
             return True
         return False
 
-    def bind_queue(self, queue: Queueable) -> None:
+    def bind_queue(self, queue: Queueable | None) -> None:
         """Alias for bindQueue"""
         return self.bindQueue(queue)
 
-    def bindQueue(self, queue: Queueable) -> None:
+    def bindQueue(self, queue: Queueable | None) -> None:
         """Supply a queue reference for data placement"""
         self.queue = queue
 
