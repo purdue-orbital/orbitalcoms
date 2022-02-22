@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import logging
-from ....orbitalcoms import _util
+from ..._utils import log
 
 from threading import Condition
 from typing import TYPE_CHECKING, Set
@@ -16,7 +16,7 @@ if TYPE_CHECKING:
     from ..strategies import ComsStrategy
     from ..subscribers import ComsSubscriberLike
 
-logger = _util.make_logger(__name__, logging.ERROR)
+logger = log.make_logger(__name__, logging.ERROR)
 
 class ComsDriver:
     """Drive Communication using a strategy"""

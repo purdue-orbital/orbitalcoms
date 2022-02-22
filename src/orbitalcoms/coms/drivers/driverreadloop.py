@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import logging
-from ....orbitalcoms import _util
+from ..._utils import log
 import multiprocessing as mp
 from multiprocessing.connection import Connection
 from threading import Event, Thread
@@ -11,7 +11,7 @@ if TYPE_CHECKING:
     from ..strategies.strategy import ComsStrategy
     from .driver import ComsDriver
 
-logger = _util.make_logger(__name__, logging.ERROR)
+logger = log.make_logger(__name__, logging.ERROR)
 
 class ComsDriverReadLoop(Thread):
     def __init__(
@@ -56,9 +56,9 @@ class ComsDriverReadLoop(Thread):
 
 
 def _get_msg(strat: ComsStrategy, conn: Connection) -> None:
-    """Fucntion run to get recieve next message
-    NOTE: This function must by top level to work with
-    multiproccessing spawn strat on windows and macos
+    """Function run to get receive next message
+    NOTE: This function must be top level to work with
+    multiprocessing spawn start on windows and macos
     """
     try:
         conn.send(strat.read())
