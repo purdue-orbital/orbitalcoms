@@ -1,7 +1,8 @@
 from __future__ import annotations
 
 from abc import ABC, abstractmethod
-from typing import Any, Dict
+from threading import Event, Thread
+from typing import Any, Callable, Dict
 
 from typing_extensions import Protocol
 
@@ -24,7 +25,11 @@ class Station(ABC):
 
         self.queue: Queueable | None = None
 
-        def recieve(message: ComsMessage) -> None:
+        self._timeout_thread: Station.StoppableThread = type(self).StoppableThread(
+            self.resend_last
+        )
+
+        def recieve(message: ComsMessage) -> None:  # typo
             self._on_receive(message)
             self._last_recieved = message
             if self.queue is not None:
@@ -75,7 +80,7 @@ class Station(ABC):
 
     def _on_send(self, new: ComsMessage) -> Any:
         ...
-    
+
     def _is_valid_state_change(self, new: ComsMessage) -> bool:
         if self._last_sent is not None:
             if self.abort != new.ABORT:
@@ -83,7 +88,13 @@ class Station(ABC):
             elif self.armed != new.ARMED:
                 return not self.armed
             elif self.launch != new.LAUNCH:
-                return self.armed and not self.abort and not self.qdm and not self.launch and self.stab
+                return (
+                    self.armed
+                    and not self.abort
+                    and not self.qdm
+                    and not self.launch
+                    and self.stab
+                )
             elif self.qdm != new.QDM:
                 return self.armed and not self.qdm
             elif self.stab != new.STAB:
@@ -93,13 +104,20 @@ class Station(ABC):
                 print("...How did you get here?")
                 raise ValueError
         else:
-            return new.ARMED
+            print("none")
+            print(bool(new.ARMED))
+            return bool(new.ARMED)
 
     def send(self, data: ParsableComType) -> bool:
         try:
             message = construct_message(data)
             if not self._is_valid_state_change(message):
+                print("not valid")
                 return False
+            if self._timeout_thread.is_alive():
+                self._timeout_thread.stop()
+            self._timeout_thread.start()
+
         except Exception:
             return False
         if self._coms.write(message, suppress_errors=True):
@@ -107,6 +125,13 @@ class Station(ABC):
             self._last_sent = message
             return True
         return False
+
+    def resend_last(self) -> None:
+        if self._last_sent is not None:
+            self._coms.write(self._last_sent, suppress_errors=True)
+            self._on_send(self._last_sent)
+        else:
+            ...        #maybe raise error? log?
 
     def bind_queue(self, queue: Queueable) -> None:
         """Alias for bindQueue"""
@@ -130,6 +155,21 @@ class Station(ABC):
 
     def getArmedFlag(self) -> bool:
         return self.armed
+
+    class StoppableThread(Thread):
+        def __init__(self, resend_func: Callable[[], None], *a: Any, **kw: Any) -> None:
+            self.stop_event = Event()
+            self.resend_func = resend_func
+            super().__init__(*a, **kw)
+
+        def run(self) -> None:
+            while not self.stop_event.is_set():
+                TIMEOUT = 6  # TODO: make this a constant somewhere else
+                self.stop_event.wait(TIMEOUT)
+                self.resend_func()
+
+        def stop(self) -> None:
+            self.stop_event.set()
 
 
 class Queueable(Protocol):
