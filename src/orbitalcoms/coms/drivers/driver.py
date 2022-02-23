@@ -1,11 +1,10 @@
 from __future__ import annotations
 
 import logging
-from ..._utils import log
-
 from threading import Condition
 from typing import TYPE_CHECKING, Set
 
+from ..._utils import log
 from ..errors import ComsDriverReadError, ComsDriverWriteError
 from ..messages import construct_message
 from ..subscribers import OneTimeComsSubscription
@@ -17,6 +16,7 @@ if TYPE_CHECKING:
     from ..subscribers import ComsSubscriberLike
 
 logger = log.make_logger(__name__, logging.ERROR)
+
 
 class ComsDriver:
     """Drive Communication using a strategy"""

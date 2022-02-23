@@ -1,17 +1,19 @@
 from __future__ import annotations
 
 import logging
-from ..._utils import log
 import multiprocessing as mp
 from multiprocessing.connection import Connection
 from threading import Event, Thread
 from typing import TYPE_CHECKING, Tuple
+
+from ..._utils import log
 
 if TYPE_CHECKING:
     from ..strategies.strategy import ComsStrategy
     from .driver import ComsDriver
 
 logger = log.make_logger(__name__, logging.ERROR)
+
 
 class ComsDriverReadLoop(Thread):
     def __init__(
