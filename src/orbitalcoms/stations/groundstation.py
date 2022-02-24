@@ -67,10 +67,10 @@ class GroundStation(Station):
             if not self._is_valid_state_change(message):
                 return False
             
-            if self._timeout_thread.is_alive():
-                self._timeout_thread.stop()
-            self._timeout_thread = self.StoppableThread(self.resend_last)
-            self._timeout_thread.start()
+            # if self._timeout_thread.is_alive():
+            #     self._timeout_thread.stop()
+            # self._timeout_thread = self.StoppableThread(self.resend_last)
+            # self._timeout_thread.start()
         except Exception: 
             return False
 
