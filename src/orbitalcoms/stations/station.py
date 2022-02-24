@@ -2,9 +2,12 @@ from __future__ import annotations
 
 from abc import ABC, abstractmethod
 from threading import Event, Thread
-from typing import Any, Callable, Dict
+from typing import Any, Callable, Dict, Type
+from types import TracebackType
 
 from typing_extensions import Protocol
+
+from orbitalcoms import ComsMessageParseError
 
 from ..coms import (
     ComsDriver,
@@ -20,7 +23,7 @@ class Station(ABC):
         self._coms = coms
 
         self._last_sent: ComsMessage | None = None
-        self._last_recieved: ComsMessage | None = None
+        self._last_received: ComsMessage | None = None
         self._last_data: Dict[str, Any] | None = None
 
         self.queue: Queueable | None = None
@@ -29,14 +32,31 @@ class Station(ABC):
             self.resend_last
         )
 
-        def recieve(message: ComsMessage) -> None:  # typo
+        def receive(message: ComsMessage) -> None:
             self._on_receive(message)
-            self._last_recieved = message
+            self._last_received = message
             if self.queue is not None:
                 self.queue.append(message)
 
-        self._coms.register_subscriber(ComsSubscription(recieve))
+        self._coms.register_subscriber(ComsSubscription(receive))
         self._coms.start_read_loop()
+
+    def __enter__(self) -> Station:
+        return self
+
+    def __exit__(
+        self,
+        exc_type: Type[BaseException] | None,
+        exc_value: BaseException | None,
+        tb: TracebackType | None,
+    ) -> None:
+        self.__cleanup()
+
+    def __del__(self) -> None:
+        self.__cleanup()
+
+    def __cleanup(self) -> None:
+        self._coms.end_read_loop()
 
     @property
     @abstractmethod
@@ -72,8 +92,8 @@ class Station(ABC):
         return self._last_sent
 
     @property
-    def last_recieved(self) -> ComsMessage | None:
-        return self._last_recieved
+    def last_received(self) -> ComsMessage | None:
+        return self._last_received
 
     def _on_receive(self, new: ComsMessage) -> Any:
         ...
@@ -81,44 +101,10 @@ class Station(ABC):
     def _on_send(self, new: ComsMessage) -> Any:
         ...
 
-    def _is_valid_state_change(self, new: ComsMessage) -> bool:
-        if self._last_sent is not None:
-            if self.abort != new.ABORT:
-                return self.armed and not self.abort
-            elif self.armed != new.ARMED:
-                return not self.armed
-            elif self.launch != new.LAUNCH:
-                return (
-                    self.armed
-                    and not self.abort
-                    and not self.qdm
-                    and not self.launch
-                    and self.stab
-                )
-            elif self.qdm != new.QDM:
-                return self.armed and not self.qdm
-            elif self.stab != new.STAB:
-                return self.armed
-            else:
-                # should never trigger
-                print("...How did you get here?")
-                raise ValueError
-        else:
-            print("none")
-            print(bool(new.ARMED))
-            return bool(new.ARMED)
-
     def send(self, data: ParsableComType) -> bool:
         try:
             message = construct_message(data)
-            if not self._is_valid_state_change(message):
-                print("not valid")
-                return False
-            if self._timeout_thread.is_alive():
-                self._timeout_thread.stop()
-            self._timeout_thread.start()
-
-        except Exception:
+        except (TypeError, ComsMessageParseError):
             return False
         if self._coms.write(message, suppress_errors=True):
             self._on_send(message)
@@ -133,11 +119,11 @@ class Station(ABC):
         else:
             ...        #maybe raise error? log?
 
-    def bind_queue(self, queue: Queueable) -> None:
+    def bind_queue(self, queue: Queueable | None) -> None:
         """Alias for bindQueue"""
         return self.bindQueue(queue)
 
-    def bindQueue(self, queue: Queueable) -> None:
+    def bindQueue(self, queue: Queueable | None) -> None:
         """Supply a queue reference for data placement"""
         self.queue = queue
 
@@ -164,13 +150,12 @@ class Station(ABC):
 
         def run(self) -> None:
             while not self.stop_event.is_set():
-                TIMEOUT = 6  # TODO: make this a constant somewhere else
+                TIMEOUT = 2  # TODO: make this a constant somewhere else
                 self.stop_event.wait(TIMEOUT)
                 self.resend_func()
 
         def stop(self) -> None:
             self.stop_event.set()
-
 
 class Queueable(Protocol):
     """Class able to queue messages"""

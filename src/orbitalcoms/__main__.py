@@ -3,7 +3,7 @@ from typing import cast
 
 from typing_extensions import Protocol
 
-import orbitalcoms._app.headless as headles
+import orbitalcoms._app.headless as headless
 import orbitalcoms._app.tkgui as tkgui
 from orbitalcoms.coms.drivers import ComsDriver
 from orbitalcoms.coms.strategies import SerialComsStrategy, SocketComsStrategy
@@ -41,7 +41,7 @@ def main() -> None:
     if args.frontend == "dev":
         tkgui.run_app(GroundStation(coms))
     elif args.frontend == "headless":
-        headles.run_app(GroundStation(coms))
+        headless.run_app(GroundStation(coms))
     else:
         raise ValueError("Failed to find selected frontend")
 
@@ -51,14 +51,14 @@ def get_args() -> BaseArgs:
     parser.add_argument(
         "--frontend",
         "-f",
-        help="The forntend used for to dispaling groundsationinformation",
+        help="The frontend used for to dispaling ground sation information",
         default="dev",
         type=str,
     )
     subparsers = parser.add_subparsers(
         title="Connection",
         dest="connection",
-        description="Determines the comunications strategy used by the Mock Launch Station",
+        description="Determines the communications strategy used by the ground station",
         required=True,
         help="Available connection types",
     )
@@ -81,7 +81,7 @@ def get_args() -> BaseArgs:
     serial.add_argument(
         "--port",
         "-p",
-        help="Serial port to send data to",
+        help="Serial port to use",
         default="/dev/ttyUSB0",
         type=str,
     )

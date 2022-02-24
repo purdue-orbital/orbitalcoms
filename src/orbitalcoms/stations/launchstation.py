@@ -11,30 +11,30 @@ class LaunchStation(Station):
 
     @property
     def abort(self) -> bool:
-        if self.last_recieved is None:
+        if self.last_received is None:
             return False
-        return bool(self.last_recieved.ABORT)
+        return bool(self.last_received.ABORT)
 
     @property
     def qdm(self) -> bool:
-        if self.last_recieved is None:
+        if self.last_received is None:
             return False
-        return bool(self.last_recieved.QDM)
+        return bool(self.last_received.QDM)
 
     @property
     def stab(self) -> bool:
-        if self.last_recieved is None:
+        if self.last_received is None:
             return False
-        return bool(self.last_recieved.STAB)
+        return bool(self.last_received.STAB)
 
     @property
     def launch(self) -> bool:
-        if self.last_recieved is None:
+        if self.last_received is None:
             return False
-        return bool(self.last_recieved.LAUNCH)
+        return bool(self.last_received.LAUNCH)
 
     @property
     def armed(self) -> bool:
-        if self.last_recieved is None:
+        if self.last_received is None:
             return False
-        return bool(self.last_recieved.ARMED)
+        return bool(self.last_received.ARMED)

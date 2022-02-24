@@ -1,11 +1,15 @@
 import threading as th
+import time
 from typing import List, Tuple
 
 import pytest
 
 from orbitalcoms.coms.drivers.driver import ComsDriver
 from orbitalcoms.coms.messages.message import ComsMessage
-from orbitalcoms.coms.strategies.localstrat import get_linked_local_strats
+from orbitalcoms.coms.strategies.localstrat import (
+    LocalComsStrategy,
+    get_linked_local_strats,
+)
 from orbitalcoms.coms.subscribers.subscription import ComsSubscription
 from orbitalcoms.stations.groundstation import GroundStation
 
@@ -66,7 +70,7 @@ def test_bind_queue(gs_and_loc: Tuple[GroundStation, ComsDriver]):
         assert msg.DATA["msg"] == f"this is msg #{i+1}"
 
 
-def test_state_mataches_sent(gs_and_loc: Tuple[GroundStation, ComsDriver]):
+def test_state_matches_sent(gs_and_loc: Tuple[GroundStation, ComsDriver]):
     gs, _ = gs_and_loc
 
     def send_msg(a, q, s, ln):
@@ -77,10 +81,10 @@ def test_state_mataches_sent(gs_and_loc: Tuple[GroundStation, ComsDriver]):
         assert gs.stab == gs.getStabFlag() == bool(s)
         assert gs.armed == gs.getArmedFlag() and gs.armed is True
 
+    send_msg(0, 0, 0, 0)
     send_msg(0, 0, 1, 0)
     send_msg(0, 0, 1, 1)
-    send_msg(1, 0, 1, 1)
-    send_msg(1, 1, 1, 1)
+    send_msg(0, 1, 1, 1)
 
 
 def test_data_matches_last_recv(gs_and_loc: Tuple[GroundStation, ComsDriver]):
@@ -130,3 +134,11 @@ def test_station_does_not_unarm(gs_and_loc: Tuple[GroundStation, ComsDriver]):
     with pytest.raises(Exception):  # TODO: tighter exception needed
         gs.send(ComsMessage(0, 0, 0, 0, ARMED=1, DATA={"key1": 1}))
         gs.send(ComsMessage(0, 0, 0, 0, ARMED=0, DATA={"key2": 2}))
+
+
+def test_clean_up_on_end_ctx():
+    starting_num_threads = th.active_count()
+    with GroundStation(ComsDriver(LocalComsStrategy())):
+        time.sleep(1)
+        assert th.active_count() == starting_num_threads + 1
+    assert th.active_count() == starting_num_threads
