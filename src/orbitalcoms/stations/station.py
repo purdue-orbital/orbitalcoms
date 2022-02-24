@@ -2,8 +2,8 @@ from __future__ import annotations
 
 from abc import ABC, abstractmethod
 from threading import Event, Thread
-from typing import Any, Callable, Dict, Type
 from types import TracebackType
+from typing import Any, Callable, Dict, Type
 
 from typing_extensions import Protocol
 
@@ -17,6 +17,7 @@ from ..coms import (
     construct_message,
 )
 
+TIMEOUT = 5.0
 
 class Station(ABC):
     def __init__(self, coms: ComsDriver):
@@ -28,8 +29,8 @@ class Station(ABC):
 
         self.queue: Queueable | None = None
 
-        self._timeout_thread: Station.StoppableThread = type(self).StoppableThread(
-            self.resend_last
+        self._timeout_thread = _AutoSendOnInterval(
+            self.resend_last, TIMEOUT
         )
 
         def receive(message: ComsMessage) -> None:
@@ -111,7 +112,7 @@ class Station(ABC):
             self._last_sent = message
             if self._timeout_thread.is_alive():
                 self._timeout_thread.stop()
-            self._timeout_thread = self.StoppableThread(self.resend_last)
+            self._timeout_thread = _AutoSendOnInterval(self.resend_last, TIMEOUT)
             self._timeout_thread.start()
             return True
         return False
@@ -121,7 +122,7 @@ class Station(ABC):
             self._coms.write(self._last_sent, suppress_errors=True)
             self._on_send(self._last_sent)
         else:
-            ...        #maybe raise error? log?
+            ...  # maybe raise error? log?
 
     def bind_queue(self, queue: Queueable | None) -> None:
         """Alias for bindQueue"""
@@ -146,20 +147,22 @@ class Station(ABC):
     def getArmedFlag(self) -> bool:
         return self.armed
 
-    class StoppableThread(Thread):
-        def __init__(self, resend_func: Callable[[], None], *a: Any, **kw: Any) -> None:
-            self.stop_event = Event()
-            self.resend_func = resend_func
-            super().__init__(*a, **kw)
 
-        def run(self) -> None:
-            while not self.stop_event.is_set():
-                TIMEOUT = 2  # TODO: make this a constant somewhere else
-                self.stop_event.wait(TIMEOUT)
+class _AutoSendOnInterval(Thread):
+    def __init__(self, resend_func: Callable[[], None], interval: float, *a: Any, **kw: Any) -> None:
+        self.stop_event = Event()
+        self.resend_func = resend_func
+        self.interval = interval
+        super().__init__(*a, **kw)
+
+    def run(self) -> None:
+        while not self.stop_event.is_set():
+            self.stop_event.wait(self.interval)
+            if not self.stop_event.is_set():
                 self.resend_func()
 
-        def stop(self) -> None:
-            self.stop_event.set()
+    def stop(self) -> None:
+        self.stop_event.set()
 
 class Queueable(Protocol):
     """Class able to queue messages"""
