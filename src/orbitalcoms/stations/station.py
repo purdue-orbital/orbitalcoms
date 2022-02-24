@@ -109,6 +109,10 @@ class Station(ABC):
         if self._coms.write(message, suppress_errors=True):
             self._on_send(message)
             self._last_sent = message
+            if self._timeout_thread.is_alive():
+                self._timeout_thread.stop()
+            self._timeout_thread = self.StoppableThread(self.resend_last)
+            self._timeout_thread.start()
             return True
         return False
 
