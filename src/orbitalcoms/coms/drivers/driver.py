@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import logging
+import traceback
 from threading import Condition
 from typing import TYPE_CHECKING, Set
 
@@ -89,7 +90,7 @@ class ComsDriver:
         for s in self.subscrbers.copy():
             try:
                 s.update(m, self)
-            except Exception as e:
-                logger.error(f"subscriber through exception: {e}")
+            except Exception:
+                logger.error(f"subscriber raised exception: {traceback.format_exc()}")
                 if not s.expect_err:
                     self.unregister_subscriber(s)
