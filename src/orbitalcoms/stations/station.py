@@ -17,10 +17,8 @@ from ..coms import (
     construct_message,
 )
 
-TIMEOUT = 5.0
-
 class Station(ABC):
-    def __init__(self, coms: ComsDriver):
+    def __init__(self, coms: ComsDriver, timeout: float = 0.0):
         self._coms = coms
 
         self._last_sent: ComsMessage | None = None
@@ -29,8 +27,10 @@ class Station(ABC):
 
         self.queue: Queueable | None = None
 
+        self._timeout = timeout
+
         self._timeout_thread = _AutoSendOnInterval(
-            self.resend_last, TIMEOUT
+            self.resend_last, self._timeout
         )
 
         def receive(message: ComsMessage) -> None:
@@ -110,9 +110,13 @@ class Station(ABC):
         if self._coms.write(message, suppress_errors=True):
             self._on_send(message)
             self._last_sent = message
+
             if self._timeout_thread.is_alive():
                 self._timeout_thread.stop()
-            self._timeout_thread = _AutoSendOnInterval(self.resend_last, TIMEOUT)
+
+            if self._timeout != 0:
+                self._timeout_thread = _AutoSendOnInterval(self.resend_last, self._timeout)
+
             self._timeout_thread.start()
             return True
         return False
@@ -123,6 +127,17 @@ class Station(ABC):
             self._on_send(self._last_sent)
         else:
             ...  # maybe raise error? log?
+    
+    def set_send_interval(self, interval: float | None) -> None:
+        if interval is not None and not isinstance(interval, (int, float)):
+            raise TypeError()
+        
+        if interval is None:
+            interval = 0.0
+        elif interval < 0:
+            raise ValueError()
+        
+        self._timeout = interval
 
     def bind_queue(self, queue: Queueable | None) -> None:
         """Alias for bindQueue"""
@@ -150,10 +165,10 @@ class Station(ABC):
 
 class _AutoSendOnInterval(Thread):
     def __init__(self, resend_func: Callable[[], None], interval: float, *a: Any, **kw: Any) -> None:
+        super().__init__(*a, **kw)
         self.stop_event = Event()
         self.resend_func = resend_func
         self.interval = interval
-        super().__init__(*a, **kw)
 
     def run(self) -> None:
         while not self.stop_event.is_set():
