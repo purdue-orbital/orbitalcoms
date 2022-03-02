@@ -53,7 +53,7 @@ class GroundStationFrame(tk.Frame):
             self, text="QDM", command=lambda: self.send_state("QDM")
         )
         self.btn_stab = tk.Button(
-            self, text="STABALIZE", command=lambda: self.send_state("STAB")
+            self, text="STABILIZE", command=lambda: self.send_state("STAB")
         )
         self.btn_launch = tk.Button(
             self, text="LAUNCH", command=lambda: self.send_state("LAUNCH")
