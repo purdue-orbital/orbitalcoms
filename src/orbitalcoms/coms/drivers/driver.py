@@ -47,7 +47,7 @@ class ComsDriver:
             self._read_loop = None
 
     def _spawn_read_loop_thread(self) -> ComsDriverReadLoop:
-        return ComsDriverReadLoop(self, daemon=True)
+        return ComsDriverReadLoop(self._strategy, self._notify_subscribers, daemon=True)
 
     @property
     def is_reading(self) -> bool:
