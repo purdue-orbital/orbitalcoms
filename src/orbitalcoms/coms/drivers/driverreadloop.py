@@ -41,7 +41,7 @@ class ComsDriverReadLoop(Thread):
                 if isinstance(received, Exception):
                     logger.error(f"received exception: {received}")
                 else:
-                    self._coms._notify_subscribers(received)
+                    self._recv_callback(received)
                 proc, conn = self._spawn_get_msg_proc()
                 proc.start()
             proc.join(timeout=1)
