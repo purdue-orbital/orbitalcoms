@@ -113,7 +113,7 @@ def test_send_bad_msg_fails(gs_and_loc: Tuple[GroundStation, ComsDriver]):
     assert len(loc_read) == 0
 
 
-@pytest.mark.skip(reason="Feature not implimented")
+@pytest.mark.skip(reason="Feature not implemented")
 def test_data_retains_unupdated_keys(gs_and_loc: Tuple[GroundStation, ComsDriver]):
     gs, loc = gs_and_loc
 
@@ -127,7 +127,7 @@ def test_data_retains_unupdated_keys(gs_and_loc: Tuple[GroundStation, ComsDriver
     assert gs.data["key3"] == ":)"
 
 
-@pytest.mark.skip(reason="Feature not implimented")
+@pytest.mark.skip(reason="Feature not implemented")
 def test_station_does_not_unarm(gs_and_loc: Tuple[GroundStation, ComsDriver]):
     gs, _ = gs_and_loc
 

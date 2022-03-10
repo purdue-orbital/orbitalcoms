@@ -22,6 +22,9 @@ class ComsDriver:
         self._read_loop: ComsDriverReadLoop | None = None
         self._strategy = strategy
 
+    def __del__(self):
+        self.end_read_loop()
+
     @property
     def strategy(self) -> ComsStrategy:
         return self._strategy

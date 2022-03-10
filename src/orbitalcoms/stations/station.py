@@ -116,8 +116,8 @@ class Station(ABC):
 
             if self._timeout != 0:
                 self._timeout_thread = _AutoSendOnInterval(self.resend_last, self._timeout)
+                self._timeout_thread.start()
 
-            self._timeout_thread.start()
             return True
         return False
 
@@ -178,6 +178,7 @@ class _AutoSendOnInterval(Thread):
 
     def stop(self) -> None:
         self.stop_event.set()
+        self.join()
 
 class Queueable(Protocol):
     """Class able to queue messages"""
