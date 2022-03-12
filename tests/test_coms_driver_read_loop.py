@@ -1,6 +1,5 @@
 import time
 
-from orbitalcoms.coms.drivers.driver import ComsDriver
 from orbitalcoms.coms.drivers.driverreadloop import ComsDriverReadLoop
 
 
@@ -17,7 +16,7 @@ class WastTimeStrat:
 
 def test_start_stop_read_loop():
     # Not gonna pass type checking, just make sure it wakes up and dies
-    rl = ComsDriverReadLoop(ComsDriver(WastTimeStrat(1)),lambda:..., daemon=True)
+    rl = ComsDriverReadLoop(WastTimeStrat(1), lambda x: ..., daemon=True)
     rl.start()
     time.sleep(1)
     assert rl.is_alive()
@@ -26,7 +25,7 @@ def test_start_stop_read_loop():
 
 
 def test_ends_on_stop_in_short_time():
-    rl = ComsDriverReadLoop(ComsDriver(WastTimeStrat(10000)), lambda:..., daemon=True)
+    rl = ComsDriverReadLoop(WastTimeStrat(10000), lambda x: ..., daemon=True)
     start = time.time()
     rl.start()
     time.sleep(1)

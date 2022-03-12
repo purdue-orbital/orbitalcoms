@@ -4,16 +4,13 @@ import logging
 import multiprocessing as mp
 from multiprocessing.connection import Connection
 from threading import Event, Thread
-from typing import TYPE_CHECKING, Tuple
-from typing import Callable
-from typing import Any
-
+from typing import TYPE_CHECKING, Any, Callable, Tuple
 
 from ..._utils import log
 
 if TYPE_CHECKING:
-    from ..strategies.strategy import ComsStrategy
     from ..messages import ComsMessage
+    from ..strategies.strategy import ComsStrategy
 
 logger = log.make_logger(__name__, logging.ERROR)
 
