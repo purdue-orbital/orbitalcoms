@@ -7,7 +7,7 @@ from typing import Any, Callable, Dict, Type
 
 from typing_extensions import Protocol
 
-from orbitalcoms import ComsMessageParseError
+from ..coms.errors import ComsMessageParseError
 
 from ..coms import (
     ComsDriver,
@@ -130,12 +130,12 @@ class Station(ABC):
     
     def set_send_interval(self, interval: float | None) -> None:
         if interval is not None and not isinstance(interval, (int, float)):
-            raise TypeError()
+            raise TypeError("Expected interval of type `float` or `None`")
         
         if interval is None:
             interval = 0.0
         elif interval < 0:
-            raise ValueError()
+            raise ValueError("Send inverval cannot be less than 0")
         
         self._timeout = interval
 
