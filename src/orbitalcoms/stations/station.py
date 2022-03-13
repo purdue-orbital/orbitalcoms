@@ -18,7 +18,7 @@ from ..coms import (
 )
 from ..coms.errors import ComsMessageParseError
 
-logger = make_logger(__name__, logging.ERROR)
+logger = make_logger(__name__, logging.WARNING)
 
 
 class Station(ABC):
@@ -178,8 +178,7 @@ class _AutoSendOnInterval(Thread):
         self.interval = interval
 
     def run(self) -> None:
-        while not self.stop_event.is_set():
-            self.stop_event.wait(self.interval)
+        while not self.stop_event.wait(self.interval):
             if not self.stop_event.is_set():
                 self.resend_func()
 
