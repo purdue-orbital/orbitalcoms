@@ -1,8 +1,11 @@
 from __future__ import annotations
 
+import logging
+import traceback
 from threading import Condition
 from typing import TYPE_CHECKING, Set
 
+from ..._utils import log
 from ..errors import ComsDriverReadError, ComsDriverWriteError
 from ..messages import construct_message
 from ..subscribers import OneTimeComsSubscription
@@ -12,6 +15,8 @@ if TYPE_CHECKING:
     from ..messages import ComsMessage, ParsableComType
     from ..strategies import ComsStrategy
     from ..subscribers import ComsSubscriberLike
+
+logger = log.make_logger(__name__, logging.ERROR)
 
 
 class ComsDriver:
@@ -45,7 +50,7 @@ class ComsDriver:
             self._read_loop = None
 
     def _spawn_read_loop_thread(self) -> ComsDriverReadLoop:
-        return ComsDriverReadLoop(self, daemon=True)
+        return ComsDriverReadLoop(self._strategy, self._notify_subscribers, daemon=True)
 
     @property
     def is_reading(self) -> bool:
@@ -89,6 +94,6 @@ class ComsDriver:
             try:
                 s.update(m, self)
             except Exception:
-                # TODO: Add logging here
+                logger.error(f"subscriber raised exception: {traceback.format_exc()}")
                 if not s.expect_err:
                     self.unregister_subscriber(s)

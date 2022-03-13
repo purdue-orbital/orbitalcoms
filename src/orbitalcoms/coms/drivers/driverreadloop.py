@@ -1,25 +1,32 @@
 from __future__ import annotations
 
+import logging
 import multiprocessing as mp
 from multiprocessing.connection import Connection
 from threading import Event, Thread
-from typing import TYPE_CHECKING, Tuple
+from typing import TYPE_CHECKING, Any, Callable, Tuple
+
+from ..._utils import log
 
 if TYPE_CHECKING:
+    from ..messages import ComsMessage
     from ..strategies.strategy import ComsStrategy
-    from .driver import ComsDriver
+
+logger = log.make_logger(__name__, logging.ERROR)
 
 
 class ComsDriverReadLoop(Thread):
     def __init__(
         self,
-        coms: ComsDriver,
+        coms_strat: ComsStrategy,
+        recv_callback: Callable[[ComsMessage], Any],
         name: str | None = None,
         daemon: bool | None = None,
     ) -> None:
         super().__init__(name=name, daemon=daemon)
         self._stop_event = Event()
-        self._coms = coms
+        self._coms_strat = coms_strat
+        self._recv_callback = recv_callback
 
     def run(self) -> None:
         proc, conn = self._spawn_get_msg_proc()
@@ -27,12 +34,11 @@ class ComsDriverReadLoop(Thread):
 
         while not self._stop_event.is_set():
             if not proc.is_alive():
-                recived = conn.recv()
-                if isinstance(recived, Exception):
-                    # TODO: Add logging
-                    ...
+                received = conn.recv()
+                if isinstance(received, Exception):
+                    logger.error(f"received exception: {received}")
                 else:
-                    self._coms._notify_subscribers(recived)
+                    self._recv_callback(received)
                 proc, conn = self._spawn_get_msg_proc()
                 proc.start()
             proc.join(timeout=1)
@@ -44,7 +50,7 @@ class ComsDriverReadLoop(Thread):
         a, b = mp.Pipe()
 
         return (
-            mp.Process(target=_get_msg, args=(self._coms.strategy, a), daemon=True),
+            mp.Process(target=_get_msg, args=(self._coms_strat, a), daemon=True),
             b,
         )
 
@@ -54,9 +60,9 @@ class ComsDriverReadLoop(Thread):
 
 
 def _get_msg(strat: ComsStrategy, conn: Connection) -> None:
-    """Fucntion run to get receive next message
-    NOTE: This function must by top level to work with
-    multiproccessing spawn strat on windows and macos
+    """Function run to get receive next message
+    NOTE: This function must be top level to work with
+    multiprocessing spawn start on windows and macos
     """
     try:
         conn.send(strat.read())
