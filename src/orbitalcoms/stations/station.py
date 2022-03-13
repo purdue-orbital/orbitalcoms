@@ -182,9 +182,9 @@ class _AutoSendOnInterval(Thread):
             if not self.stop_event.is_set():
                 self.resend_func()
 
-    def stop(self) -> None:
+    def stop(self, timeout: float | None = None) -> None:
         self.stop_event.set()
-        self.join()
+        self.join(timeout=timeout)
 
 
 class Queueable(Protocol):
