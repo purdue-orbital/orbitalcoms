@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import logging
 from abc import ABC, abstractmethod
 from threading import Event, Thread
 from types import TracebackType
@@ -7,8 +8,7 @@ from typing import Any, Callable, Dict, Type
 
 from typing_extensions import Protocol
 
-from ..coms.errors import ComsMessageParseError
-
+from .._utils.log import make_logger
 from ..coms import (
     ComsDriver,
     ComsMessage,
@@ -16,6 +16,10 @@ from ..coms import (
     ParsableComType,
     construct_message,
 )
+from ..coms.errors import ComsMessageParseError
+
+logger = make_logger(__name__, logging.ERROR)
+
 
 class Station(ABC):
     def __init__(self, coms: ComsDriver, timeout: float = 0.0):
@@ -29,9 +33,7 @@ class Station(ABC):
 
         self._timeout = timeout
 
-        self._timeout_thread = _AutoSendOnInterval(
-            self.resend_last, self._timeout
-        )
+        self._timeout_thread = _AutoSendOnInterval(self.resend_last, self._timeout)
 
         def receive(message: ComsMessage) -> None:
             self._on_receive(message)
@@ -115,7 +117,9 @@ class Station(ABC):
                 self._timeout_thread.stop()
 
             if self._timeout != 0:
-                self._timeout_thread = _AutoSendOnInterval(self.resend_last, self._timeout)
+                self._timeout_thread = _AutoSendOnInterval(
+                    self.resend_last, self._timeout
+                )
                 self._timeout_thread.start()
 
             return True
@@ -126,17 +130,18 @@ class Station(ABC):
             self._coms.write(self._last_sent, suppress_errors=True)
             self._on_send(self._last_sent)
         else:
-            ...  # maybe raise error? log?
-    
+            # FIXME: This should send an all empty state message
+            logger.warning("No previous message sent to interval again on interval")
+
     def set_send_interval(self, interval: float | None) -> None:
         if interval is not None and not isinstance(interval, (int, float)):
             raise TypeError("Expected interval of type `float` or `None`")
-        
+
         if interval is None:
             interval = 0.0
         elif interval < 0:
             raise ValueError("Send inverval cannot be less than 0")
-        
+
         self._timeout = interval
 
     def bind_queue(self, queue: Queueable | None) -> None:
@@ -164,7 +169,9 @@ class Station(ABC):
 
 
 class _AutoSendOnInterval(Thread):
-    def __init__(self, resend_func: Callable[[], None], interval: float, *a: Any, **kw: Any) -> None:
+    def __init__(
+        self, resend_func: Callable[[], None], interval: float, *a: Any, **kw: Any
+    ) -> None:
         super().__init__(*a, **kw)
         self.stop_event = Event()
         self.resend_func = resend_func
@@ -179,6 +186,7 @@ class _AutoSendOnInterval(Thread):
     def stop(self) -> None:
         self.stop_event.set()
         self.join()
+
 
 class Queueable(Protocol):
     """Class able to queue messages"""

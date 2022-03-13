@@ -1,12 +1,12 @@
-import pytest
 import time
-
 from typing import Tuple
 
+import pytest
+
+from orbitalcoms import GroundStation, LaunchStation
 from orbitalcoms.coms.drivers.driver import ComsDriver
 from orbitalcoms.coms.messages.message import ComsMessage
 from orbitalcoms.coms.strategies.localstrat import get_linked_local_strats
-from orbitalcoms import GroundStation, LaunchStation
 
 
 @pytest.fixture
@@ -14,12 +14,12 @@ def gs_and_ls() -> Tuple[GroundStation, ComsDriver]:
     a_strat, b_strat = get_linked_local_strats()
     a = ComsDriver(a_strat)
     b = ComsDriver(b_strat)
-    
+
     gs = GroundStation(a)
     ls = LaunchStation(b)
-    
+
     yield gs, ls
-    
+
     a.end_read_loop()
     b.end_read_loop()
 
@@ -46,6 +46,7 @@ def test_gs_send_interval_msgs(gs_and_ls, int_time, wait_time):
     time.sleep(wait_time)
 
     assert len(q) == 3
+
 
 @pytest.mark.parametrize(
     "int_time,wait_time",
