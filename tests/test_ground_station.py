@@ -127,13 +127,45 @@ def test_data_retains_unupdated_keys(gs_and_loc: Tuple[GroundStation, ComsDriver
     assert gs.data["key3"] == ":)"
 
 
+def test_typical_control_pattern(gs_and_loc):
+    gs, _ = gs_and_loc
+
+    assert gs.send(ComsMessage(0, 0, 0, 0, ARMED=1))
+    assert gs.send(ComsMessage(0, 0, 1, 0, ARMED=1))
+    assert gs.send(ComsMessage(0, 0, 1, 1, ARMED=1))
+    assert gs.send(ComsMessage(0, 1, 1, 1, ARMED=1))
+    assert gs.send(ComsMessage(1, 1, 1, 1, ARMED=1))
+
+
 @pytest.mark.skip(reason="Feature not implemented")
+def test_armed_not_needed_on_future_sends(gs_and_loc):
+    gs, _ = gs_and_loc
+
+    assert gs.send(ComsMessage(0, 0, 0, 0, ARMED=1))
+    assert gs.send(ComsMessage(0, 0, 1, 0))
+    assert gs.send(ComsMessage(0, 0, 1, 1))
+    assert gs.send(ComsMessage(0, 1, 1, 1))
+    assert gs.send(ComsMessage(1, 1, 1, 1))
+
+
 def test_station_does_not_unarm(gs_and_loc: Tuple[GroundStation, ComsDriver]):
     gs, _ = gs_and_loc
 
-    with pytest.raises(Exception):  # TODO: tighter exception needed
-        gs.send(ComsMessage(0, 0, 0, 0, ARMED=1, DATA={"key1": 1}))
-        gs.send(ComsMessage(0, 0, 0, 0, ARMED=0, DATA={"key2": 2}))
+    assert gs.send(ComsMessage(0, 0, 0, 0, ARMED=1, DATA={"key1": 1}))
+    assert not gs.send(ComsMessage(0, 0, 0, 0, ARMED=0, DATA={"key2": 2}))
+
+
+def test_station_does_do_anything_before_arm(gs_and_loc):
+    gs, _ = gs_and_loc
+
+    assert not gs.send(ComsMessage(1, 0, 0, 0))
+    assert not gs.send(ComsMessage(0, 1, 0, 0))
+    assert not gs.send(ComsMessage(0, 0, 1, 0))
+    assert not gs.send(ComsMessage(0, 0, 0, 1))
+
+    assert gs.send(ComsMessage(0, 0, 0, 0, ARMED=1))
+    assert gs.send(ComsMessage(0, 0, 1, 0, ARMED=1))
+    assert gs.send(ComsMessage(1, 0, 1, 0, ARMED=1))
 
 
 def test_clean_up_on_end_ctx():

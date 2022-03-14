@@ -143,7 +143,7 @@ class Station(ABC):
         self._send_interval_time = interval
         self._start_new_interval_send()
 
-    def _start_new_interval_send(self):
+    def _start_new_interval_send(self) -> None:
         self._end_current_interval_send()
         if self._send_interval_time != 0:
             self._send_interval_thread = _AutoSendOnInterval(
@@ -151,7 +151,7 @@ class Station(ABC):
             )
             self._send_interval_thread.start()
 
-    def _end_current_interval_send(self):
+    def _end_current_interval_send(self) -> None:
         if self._send_interval_thread and self._send_interval_thread.is_alive():
             self._send_interval_thread.stop()
 
