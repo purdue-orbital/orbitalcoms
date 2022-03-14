@@ -22,7 +22,7 @@ logger = make_logger(__name__, logging.WARNING)
 
 
 class Station(ABC):
-    def __init__(self, coms: ComsDriver, timeout: float = 0.0):
+    def __init__(self, coms: ComsDriver, send_interval: float = 0.0):
         self._coms = coms
 
         self._last_sent: ComsMessage | None = None
@@ -31,11 +31,11 @@ class Station(ABC):
 
         self.queue: Queueable | None = None
 
-        self._send_interval_time = timeout
+        self._send_interval_time = 0.0
+        self._send_interval_thread: _AutoSendOnInterval | None = None
 
-        self._send_interval_thread = _AutoSendOnInterval(
-            self.resend_last, self._send_interval_time
-        )
+        if send_interval:
+            self.set_send_interval(send_interval)
 
         def receive(message: ComsMessage) -> None:
             self._on_receive(message)
