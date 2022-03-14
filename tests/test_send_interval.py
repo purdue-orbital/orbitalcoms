@@ -22,11 +22,8 @@ def gs_and_ls() -> Tuple[GroundStation, ComsDriver]:
 
     a.end_read_loop()
     b.end_read_loop()
-
-    if gs._timeout_thread and gs._timeout_thread.is_alive():
-        gs._timeout_thread.stop()
-    if ls._timeout_thread and ls._timeout_thread.is_alive():
-        ls._timeout_thread.stop()
+    gs._end_current_interval_send()
+    ls._end_current_interval_send()
 
 
 @pytest.mark.parametrize(
@@ -104,7 +101,7 @@ def test_interval_sends_updated_states(gs_and_ls: Tuple[GroundStation, LaunchSta
 
 
 @pytest.mark.skip(reason="Feature not implimented")
-def test_send_empty_message_with_no_prev_send(gs_and_ls):
+def test_send_empty_when_no_prev_send(gs_and_ls):
     gs, ls = gs_and_ls
 
     q = []

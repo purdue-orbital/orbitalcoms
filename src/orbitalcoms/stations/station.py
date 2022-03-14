@@ -31,9 +31,11 @@ class Station(ABC):
 
         self.queue: Queueable | None = None
 
-        self._timeout = timeout
+        self._send_interval_time = timeout
 
-        self._timeout_thread = _AutoSendOnInterval(self.resend_last, self._timeout)
+        self._send_interval_thread = _AutoSendOnInterval(
+            self.resend_last, self._send_interval_time
+        )
 
         def receive(message: ComsMessage) -> None:
             self._on_receive(message)
@@ -60,6 +62,7 @@ class Station(ABC):
 
     def __cleanup(self) -> None:
         self._coms.end_read_loop()
+        self._end_current_interval_send()
 
     @property
     @abstractmethod
@@ -112,16 +115,7 @@ class Station(ABC):
         if self._coms.write(message, suppress_errors=True):
             self._on_send(message)
             self._last_sent = message
-
-            if self._timeout_thread.is_alive():
-                self._timeout_thread.stop()
-
-            if self._timeout != 0:
-                self._timeout_thread = _AutoSendOnInterval(
-                    self.resend_last, self._timeout
-                )
-                self._timeout_thread.start()
-
+            self._start_new_interval_send()
             return True
         return False
 
@@ -142,7 +136,24 @@ class Station(ABC):
         elif interval < 0:
             raise ValueError("Send inverval cannot be less than 0")
 
-        self._timeout = interval
+        if self._send_interval_time == interval:
+            return
+
+        self._end_current_interval_send()
+        self._send_interval_time = interval
+        self._start_new_interval_send()
+
+    def _start_new_interval_send(self):
+        self._end_current_interval_send()
+        if self._send_interval_time != 0:
+            self._send_interval_thread = _AutoSendOnInterval(
+                self.resend_last, self._send_interval_time
+            )
+            self._send_interval_thread.start()
+
+    def _end_current_interval_send(self):
+        if self._send_interval_thread and self._send_interval_thread.is_alive():
+            self._send_interval_thread.stop()
 
     def bind_queue(self, queue: Queueable | None) -> None:
         """Alias for bindQueue"""
