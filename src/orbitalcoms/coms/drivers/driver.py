@@ -14,7 +14,7 @@ from .driverreadloop import ComsDriverReadLoop
 if TYPE_CHECKING:
     from ..messages import ComsMessage, ParsableComType
     from ..strategies import ComsStrategy
-    from ..subscribers import ComsSubscriberLike
+    from ..subscribers import ComsSubscriptionLike
 
 logger = log.make_logger(__name__, logging.ERROR)
 
@@ -33,7 +33,7 @@ class ComsDriver:
         :param strategy: An object which describes how to read/write messages
         :type strategy: ComsStrategy
         """
-        self.subscrbers: Set[ComsSubscriberLike] = set()
+        self.subscrbers: Set[ComsSubscriptionLike] = set()
         self._read_loop: ComsDriverReadLoop | None = None
         self._strategy = strategy
 
@@ -149,23 +149,23 @@ class ComsDriver:
                 return False
             raise ComsDriverWriteError(f"Failed to send message '{m}'") from e
 
-    def register_subscriber(self, sub: ComsSubscriberLike) -> None:
+    def register_subscriber(self, sub: ComsSubscriptionLike) -> None:
         """Takes a an object that will reacts to new messages. The subscriber is added to
         an internal set (meaning that order of subscribers updating cannot be guaranteed)
         and notified when a new messages is received.
 
         :param sub: An object that will react to new incoming messages
-        :type sub: ComsSubscriberLike
+        :type sub: ComsSubscriptionLike
         """
         self.subscrbers.add(sub)
 
-    def unregister_subscriber(self, sub: ComsSubscriberLike) -> None:
-        """Takes a reference to that ComsSubscriberLike and removes the subscription
+    def unregister_subscriber(self, sub: ComsSubscriptionLike) -> None:
+        """Takes a reference to that ComsSubscriptionLike and removes the subscription
         so that it will not react to future messages. If the subscriber was already not
         subscribed to the ComsDriver, this method is a NOP.
 
         :param sub: An object that will react to new incoming messages
-        :type sub: ComsSubscriberLike
+        :type sub: ComsSubscriptionLike
         """
         if sub in self.subscrbers:
             self.subscrbers.remove(sub)
