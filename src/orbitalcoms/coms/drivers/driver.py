@@ -84,7 +84,7 @@ class ComsDriver:
         :return: A thread capable of recieving new messages
         :rtype: ComsDriverReadLoop
         """
-        return ComsDriverReadLoop(self, daemon=True)
+        return ComsDriverReadLoop(self._strategy, self._notify_subscribers, daemon=True)
 
     @property
     def is_reading(self) -> bool:

@@ -41,9 +41,9 @@ def test_bind_queue(gs_and_loc: Tuple[GroundStation, ComsDriver]):
     gs.bind_queue(gs_read)
 
     def read():
-        gs._coms.read(timeout=5)
-        gs._coms.read(timeout=5)
-        gs._coms.read(timeout=5)
+        assert gs._coms.read(timeout=5)
+        assert gs._coms.read(timeout=5)
+        assert gs._coms.read(timeout=5)
 
     t = th.Thread(target=read, daemon=True)
     t.start()

@@ -19,15 +19,23 @@ from orbitalcoms.coms.strategies.serialstrat import SerialComsStrategy
 from orbitalcoms.coms.subscribers.subscription import ComsSubscription
 
 
-def test_port_access():
-    m, _ = pty.openpty()
+@pytest.fixture
+def pseudotty():
+    m, s = pty.openpty()
+    yield m, s
+    os.close(m)
+    os.close(s)
+
+
+def test_port_access(pseudotty):
+    m, _ = pseudotty
     m_name = os.ttyname(m)
     s = SerialComsStrategy.from_args(m_name, 9600)
     assert m_name == s.ser.port
 
 
-def test_baudrate_access():
-    m, _ = pty.openpty()
+def test_baudrate_access(pseudotty):
+    m, _ = pseudotty
     m_name = os.ttyname(m)
     s = SerialComsStrategy.from_args(m_name, 9600)
     assert 9600 == s.ser.baudrate
@@ -53,8 +61,8 @@ def test_baudrate_access():
         ),
     ],
 )
-def test_write(msg_a, msg_b):
-    m, s = pty.openpty()
+def test_write(pseudotty, msg_a, msg_b):
+    m, s = pseudotty
     s_name = os.ttyname(s)
     coms = ComsDriver(SerialComsStrategy.from_args(s_name, 9600))
 
@@ -93,8 +101,8 @@ def test_write(msg_a, msg_b):
         assert msgs_not_same_but_equal(m1, m2)
 
 
-def test_preproc_and_read():
-    m, s = pty.openpty()
+def test_preproc_and_read(pseudotty):
+    m, s = pseudotty
     s_name = os.ttyname(s)
     coms = ComsDriver(SerialComsStrategy.from_args(s_name, 9600))
 
