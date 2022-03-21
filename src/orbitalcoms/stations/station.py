@@ -48,14 +48,17 @@ class Station(ABC):
         self.__cleanup()
 
     def __del__(self) -> None:
+        """Deconstruct Station"""
         self.__cleanup()
 
     def __cleanup(self) -> None:
+        """Clean up resources used by the station"""
         self._coms.end_read_loop()
 
     @property
     @abstractmethod
     def abort(self) -> bool:
+        """Station"""
         ...
 
     @property
@@ -91,16 +94,35 @@ class Station(ABC):
         return self._last_received
 
     def _on_receive(self, new: ComsMessage) -> Any:
+        """Callback for when a message is received
+        
+        :param new: The received message
+        :type new: ComsMessage
+        :return: Ignored return value
+        :rtype: Any
+        """
         ...
 
     def _on_send(self, new: ComsMessage) -> Any:
+        """Callback for when a message is successfully sent
+        
+        :param new: The received message
+        :type new: ComsMessage
+        :return: Ignored return value
+        :rtype: Any
+        """
         ...
 
     def send(self, data: ParsableComType) -> bool:
+        """Construct and send a ComsMessage from the provided object
+        
+        :param data: Object to send as a ComsMessage
+        :type data: ParsableComType
+        :return bool: wether or not sending the object was successful
+        :rtype: bool
+        """
         try:
             message = construct_message(data)
-            # if not self._is_valid_state_change(message):
-            #     return False
         except (TypeError, ComsMessageParseError):
             return False
         if self._coms.write(message, suppress_errors=True):
@@ -110,31 +132,68 @@ class Station(ABC):
         return False
 
     def bind_queue(self, queue: Queueable | None) -> None:
-        """Alias for bindQueue"""
+        """Alias for bindQueue
+        
+        :param queue: Object to append messages to 
+        :type queue: Queueable | None
+        """
         return self.bindQueue(queue)
 
     def bindQueue(self, queue: Queueable | None) -> None:
-        """Supply a queue reference for data placement"""
+        """Supply or remove reference to a queueable object
+
+        The station will then try to append recieved messages to the
+        supplied object, ot stop trying to append messages if the
+        reference is to None.
+        
+        :param queue: Object to append messages to 
+        :type queue: Queueable | None
+        """
         self.queue = queue
 
     def getLaunchFlag(self) -> bool:
+        """Alias to the ``launch`` property for backward compatibility
+        
+        :return: value of ``launch`` property
+        :rtype: bool
+        """
         return self.launch
 
     def getQDMFlag(self) -> bool:
+        """Alias to the ``qdm`` property for backward compatibility
+        
+        :return: value of ``qdm`` property
+        :rtype: bool
+        """
         return self.qdm
 
     def getAbortFlag(self) -> bool:
+        """Alias to the ``armed`` property for backward compatibility
+        
+        :return: value of ``armed`` property
+        :rtype: bool
+        """
         return self.abort
 
     def getStabFlag(self) -> bool:
+        """Alias to the ``stab`` property for backward compatibility
+        
+        :return: value of ``stab`` property
+        :rtype: bool
+        """
         return self.stab
 
     def getArmedFlag(self) -> bool:
+        """Alias to the ``armed`` property for backward compatibility
+        
+        :return: value of ``armed`` property
+        :rtype: bool
+        """
         return self.armed
 
 
 class Queueable(Protocol):
-    """Class able to queue messages"""
+    """Protocol of type to be able to queue messages"""
 
     def append(self, t: Any) -> Any:
         ...
