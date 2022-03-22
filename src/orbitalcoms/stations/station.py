@@ -5,6 +5,7 @@ from abc import ABC, abstractmethod
 from threading import Event, Thread
 from types import TracebackType
 from typing import Any, Callable, Dict, Type
+import time
 
 from typing_extensions import Protocol
 
@@ -28,6 +29,8 @@ class Station(ABC):
         self._last_sent: ComsMessage | None = None
         self._last_received: ComsMessage | None = None
         self._last_data: Dict[str, Any] | None = None
+        self._last_sent_time: float | None = None
+        self._last_received_time: float | None = None
 
         self.queue: Queueable | None = None
 
@@ -42,6 +45,7 @@ class Station(ABC):
             self._last_received = message
             if self.queue is not None:
                 self.queue.append(message)
+            self._last_received_time = time.time()
 
         self._coms.register_subscriber(ComsSubscription(receive))
         self._coms.start_read_loop()
@@ -116,6 +120,7 @@ class Station(ABC):
             self._on_send(message)
             self._last_sent = message
             self._start_new_interval_send()
+            self._last_sent_time = time.time()
             return True
         return False
 
