@@ -104,6 +104,14 @@ class Station(ABC):
     @property
     def last_received(self) -> ComsMessage | None:
         return self._last_received
+    
+    @property
+    def last_sent_time(self) -> float | None:
+        return self._last_sent_time
+    
+    @property
+    def last_received_time(self) -> float | None:
+        return self._last_received_time
 
     def _on_receive(self, new: ComsMessage) -> Any:
         ...
