@@ -101,10 +101,18 @@ class GroundStationFrame(tk.Frame):
             )
 
         self.txt_sent.delete(1.0, "end")
-        self.txt_sent.insert(1.0, coms_msg_txt_fomat(self._gs.last_sent, "SENT"))
+        self.txt_sent.insert(
+            1.0,
+            coms_msg_txt_fomat(self._gs.last_sent, "SENT")
+            + f"\n\nTime Sent: {self._gs.last_sent_time}",
+        )
 
         self.txt_recv.delete(1.0, "end")
-        self.txt_recv.insert(1.0, coms_msg_txt_fomat(self._gs.last_received, "RECV"))
+        self.txt_recv.insert(
+            1.0,
+            coms_msg_txt_fomat(self._gs.last_received, "RECV")
+            + f"\n\nTime Recv: {self._gs.last_received_time}",
+        )
 
         self.txt_data.delete(1.0, "end")
         try:
