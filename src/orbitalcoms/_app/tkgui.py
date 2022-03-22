@@ -8,6 +8,7 @@ from __future__ import annotations
 import json
 import tkinter as tk
 from typing import TYPE_CHECKING, Any
+import datetime
 
 from orbitalcoms.coms.messages.message import ComsMessage
 
@@ -100,18 +101,22 @@ class GroundStationFrame(tk.Frame):
                 f"LAUNCH: {msg.LAUNCH}\n"
             )
 
+        def make_time_stamp(time: float | None) -> datetime.datetime | str:
+            if time:
+                return datetime.datetime.fromtimestamp(time)
+            return "None"
         self.txt_sent.delete(1.0, "end")
         self.txt_sent.insert(
             1.0,
             coms_msg_txt_fomat(self._gs.last_sent, "SENT")
-            + f"\n\nTime Sent: {self._gs.last_sent_time}",
+            + f"\n\nTime Sent: {make_time_stamp(self._gs.last_sent_time)}",
         )
 
         self.txt_recv.delete(1.0, "end")
         self.txt_recv.insert(
             1.0,
             coms_msg_txt_fomat(self._gs.last_received, "RECV")
-            + f"\n\nTime Recv: {self._gs.last_received_time}",
+            + f"\n\nTime Recv: {make_time_stamp(self._gs.last_received_time)}",
         )
 
         self.txt_data.delete(1.0, "end")
