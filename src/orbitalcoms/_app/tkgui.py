@@ -5,10 +5,10 @@ TODO: Replace with something better ASAP
 """
 from __future__ import annotations
 
+import datetime
 import json
 import tkinter as tk
 from typing import TYPE_CHECKING, Any
-import datetime
 
 from orbitalcoms.coms.messages.message import ComsMessage
 
@@ -105,6 +105,7 @@ class GroundStationFrame(tk.Frame):
             if time:
                 return datetime.datetime.fromtimestamp(time)
             return "None"
+
         self.txt_sent.delete(1.0, "end")
         self.txt_sent.insert(
             1.0,

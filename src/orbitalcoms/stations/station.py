@@ -1,11 +1,11 @@
 from __future__ import annotations
 
 import logging
+import time
 from abc import ABC, abstractmethod
 from threading import Event, Thread
 from types import TracebackType
 from typing import Any, Callable, Dict, Type
-import time
 
 from typing_extensions import Protocol
 
@@ -104,11 +104,11 @@ class Station(ABC):
     @property
     def last_received(self) -> ComsMessage | None:
         return self._last_received
-    
+
     @property
     def last_sent_time(self) -> float | None:
         return self._last_sent_time
-    
+
     @property
     def last_received_time(self) -> float | None:
         return self._last_received_time
