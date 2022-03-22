@@ -134,7 +134,7 @@ class Station(ABC):
         if interval is None:
             interval = 0.0
         elif interval < 0:
-            raise ValueError("Send inverval cannot be less than 0")
+            raise ValueError("Send interval cannot be less than 0")
 
         if self._send_interval_time == interval:
             return

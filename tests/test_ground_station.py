@@ -155,7 +155,7 @@ def test_station_does_not_unarm(gs_and_loc: Tuple[GroundStation, ComsDriver]):
     assert not gs.send(ComsMessage(0, 0, 0, 0, ARMED=0, DATA={"key2": 2}))
 
 
-def test_station_does_do_anything_before_arm(gs_and_loc):
+def test_station_does_not_do_anything_before_arm(gs_and_loc):
     gs, _ = gs_and_loc
 
     assert not gs.send(ComsMessage(1, 0, 0, 0))
