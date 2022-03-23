@@ -117,6 +117,36 @@ def test_send_bad_msg_fails(ls_and_loc: Tuple[LaunchStation, ComsDriver]):
     assert len(loc_read) == 0
 
 
+def test_gs_recv_time(ls_and_loc: Tuple[LaunchStation, ComsDriver]):
+    ls, loc = ls_and_loc
+
+    assert ls.last_received_time is None
+
+    assert loc.write(ComsMessage(0, 0, 0, 0, ARMED=1))
+    time.sleep(0.2)
+    assert isinstance(ls.last_received_time, float)
+    last_recv = ls.last_received_time
+
+    loc.write(ComsMessage(0, 0, 0, 0, ARMED=1))
+    time.sleep(0.2)
+    assert last_recv != ls.last_received_time
+
+
+def test_gs_send_time(ls_and_loc: Tuple[LaunchStation, ComsDriver]):
+    ls, _ = ls_and_loc
+
+    assert ls.last_sent_time is None
+
+    ls.send(ComsMessage(0, 0, 0, 0, ARMED=1))
+    time.sleep(0.2)
+    assert isinstance(ls.last_sent_time, float)
+    last_send = ls.last_sent_time
+
+    ls.send(ComsMessage(0, 0, 0, 0, ARMED=1))
+    time.sleep(0.2)
+    assert last_send != ls.last_sent_time
+
+
 def test_clean_up_on_end_ctx():
     starting_num_threads = th.active_count()
     with LaunchStation(ComsDriver(LocalComsStrategy())):
