@@ -11,22 +11,34 @@ from orbitalcoms.stations.groundstation import GroundStation
 
 
 class BaseArgs(Protocol):
+    """Base args that apply to launching orbitalcoms"""
+
     frontend: str
     interval_send: int
     connection: str
 
 
 class SocketArgs(BaseArgs, Protocol):
+    """Arguments needed for launching orbitalcoms
+    with the socket strategy
+    """
+
     host: str
     port: int
 
 
 class SerialArgs(BaseArgs, Protocol):
+    """Arguments needed for launching orbitalcoms
+    with the serial strategy
+    """
+
     port: str
     baudrate: int
 
 
 def main() -> None:
+    """Main funcion for launcheing the application"""
+
     args = get_args()
     if args.connection == "socket":
         args = cast(SocketArgs, args)
@@ -50,6 +62,11 @@ def main() -> None:
 
 
 def get_args() -> BaseArgs:
+    """Collect command line arguments
+
+    :return: An object with the cli arguments needed to run orbitalcoms
+    :rtype: BaseArgs
+    """
     parser = argparse.ArgumentParser()
     parser.add_argument(
         "--frontend",

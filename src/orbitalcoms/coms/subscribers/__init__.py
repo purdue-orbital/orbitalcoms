@@ -1,7 +1,11 @@
-from .subscription import ComsSubscriberLike, ComsSubscription, OneTimeComsSubscription
+from .subscription import (
+    ComsSubscription,
+    ComsSubscriptionLike,
+    OneTimeComsSubscription,
+)
 
 __all__ = [
-    "ComsSubscriberLike",
+    "ComsSubscriptionLike",
     "ComsSubscription",
     "OneTimeComsSubscription",
 ]

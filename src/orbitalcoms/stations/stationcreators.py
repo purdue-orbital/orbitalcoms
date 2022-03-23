@@ -13,6 +13,13 @@ def create_socket_launch_station(
 ) -> LaunchStation:
     """Convinence function for creating a Launch Station
     that communicates using a socket connection
+
+    :param host: The IP address of the host
+    :type host: str
+    :param port: port to connect to
+    :type port: int
+    :returns: Launch station communicating on a socket
+    :rtype: LaunchStation
     """
     return LaunchStation(
         ComsDriver(SocketComsStrategy.accept_connection_at(host, port))
@@ -24,6 +31,13 @@ def create_socket_ground_station(
 ) -> GroundStation:
     """Convinence function for creating a Ground Station
     that communicates using a socket connection
+
+    :param host: The IP address of the host
+    :type host: str
+    :param port: port to connect to
+    :type port: int
+    :returns: Ground station communicating on a socket
+    :rtype: GroundStation
     """
     return GroundStation(ComsDriver(SocketComsStrategy.connect_to(host, port)))
 
@@ -31,6 +45,13 @@ def create_socket_ground_station(
 def create_serial_launch_station(port: str, baudrate: int) -> LaunchStation:
     """Convinence function for creating a Launch Station
     that communicates using a serial port
+
+    :param port: Port to use for serial connection
+    :type port: str
+    :param baudrate: Baudrate for the connection
+    :type baudrate: int
+    :returns: Launch station communicating on given port
+    :rtype: LaunchStation
     """
     return LaunchStation(ComsDriver(SerialComsStrategy.from_args(port, baudrate)))
 
@@ -38,5 +59,12 @@ def create_serial_launch_station(port: str, baudrate: int) -> LaunchStation:
 def create_serial_ground_station(port: str, baudrate: int) -> GroundStation:
     """Convinence function for creating a Ground Station
     that communicates using a serial port
+
+    :param port: Port to use for serial connection
+    :type port: str
+    :param baudrate: Baudrate for the connection
+    :type baudrate: int
+    :returns: Ground station communicating on given port
+    :rtype: GroundStation
     """
     return GroundStation(ComsDriver(SerialComsStrategy.from_args(port, baudrate)))
