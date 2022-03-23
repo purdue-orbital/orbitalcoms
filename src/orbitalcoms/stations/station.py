@@ -24,11 +24,11 @@ logger = make_logger(__name__, logging.WARNING)
 
 class Station(ABC):
     """Abstract Base Class of for user facing API
-    
+
     The ``Station`` class handles nitty gritty interaction with ComsDriver
     for the users while providing conveniences such as the keeping track of
      current mission flags.
-    
+
     The ``Station`` keeps track of last sent and received ComsMessages
     wholesale along with timestamps of their occurence for users to
     be able to easily inspect and set their own mission state.
@@ -46,7 +46,6 @@ class Station(ABC):
         :param send_interval: Time to wait before autosending last state
         :type send_interval: float
         """
-
 
         self._coms = coms
 
@@ -76,7 +75,7 @@ class Station(ABC):
 
     def __enter__(self) -> Station:
         """Ctx manage a station
-        
+
         Context meanaged stations will clean up their resources
         on exiting of the context
         """
@@ -91,7 +90,7 @@ class Station(ABC):
         """End of station in ctx managed state
 
         Any and all exceptions are raised as is out of the ctx
-        
+
         NOTE: Ctx managed stations cannot be used out of their
         managed context
 
@@ -117,7 +116,7 @@ class Station(ABC):
     @abstractmethod
     def abort(self) -> bool:
         """Current station abort property
-        
+
         :returns: The boolean value of the station abort status
         :rtype: bool
         """
@@ -127,7 +126,7 @@ class Station(ABC):
     @abstractmethod
     def qdm(self) -> bool:
         """Current station QDM property
-        
+
         :returns: The boolean value of the station QDM status
         :rtype: bool
         """
@@ -137,7 +136,7 @@ class Station(ABC):
     @abstractmethod
     def stab(self) -> bool:
         """Current station stabilize property
-        
+
         :returns: The boolean value of the station stabilize status
         :rtype: bool
         """
@@ -147,7 +146,7 @@ class Station(ABC):
     @abstractmethod
     def launch(self) -> bool:
         """Current station launch property
-        
+
         :returns: The boolean value of the station launch status
         :rtype: bool
         """
@@ -157,7 +156,7 @@ class Station(ABC):
     @abstractmethod
     def armed(self) -> bool:
         """Current station armed property
-        
+
         :returns: The boolean value of the station armed status
         :rtype: bool
         """
@@ -170,7 +169,7 @@ class Station(ABC):
     @property
     def last_sent(self) -> ComsMessage | None:
         """Returns the last message sent by station
-        
+
         :returns: Last sent message
         :rtype: ComsMessage | None
         """
@@ -179,7 +178,7 @@ class Station(ABC):
     @property
     def last_received(self) -> ComsMessage | None:
         """Returns the last message received by station
-        
+
         :returns: Last received message
         :rtype: ComsMessage | None
         """
@@ -188,7 +187,7 @@ class Station(ABC):
     @property
     def last_sent_time(self) -> float | None:
         """Return the time of the last sent message as a float
-        
+
         :returns: Last sent timestamp
         :rtype: float | None
         """
@@ -197,7 +196,7 @@ class Station(ABC):
     @property
     def last_received_time(self) -> float | None:
         """Return the time of the last received message as a float
-        
+
         :returns: Last received timestamp
         :rtype: float | None
         """
@@ -205,7 +204,7 @@ class Station(ABC):
 
     def _on_receive(self, new: ComsMessage) -> Any:
         """Callback for when a message is received
-        
+
         :param new: The received message
         :type new: ComsMessage
         :return: Ignored return value
@@ -215,7 +214,7 @@ class Station(ABC):
 
     def _on_send(self, new: ComsMessage) -> Any:
         """Callback for when a message is successfully sent
-        
+
         :param new: The received message
         :type new: ComsMessage
         :return: Ignored return value
@@ -225,7 +224,7 @@ class Station(ABC):
 
     def send(self, data: ParsableComType) -> bool:
         """Construct and send a ComsMessage from the provided object
-        
+
         :param data: Object to send as a ComsMessage
         :type data: ParsableComType
         :return bool: wether or not sending the object was successful
@@ -234,6 +233,7 @@ class Station(ABC):
         try:
             message = construct_message(data)
         except (TypeError, ComsMessageParseError):
+            # FIXME: Add logging
             return False
         if self._coms.write(message, suppress_errors=True):
             self._on_send(message)
@@ -290,8 +290,8 @@ class Station(ABC):
 
     def bind_queue(self, queue: Queueable | None) -> None:
         """Alias for ``bindQueue``
-        
-        :param queue: Object to append messages to 
+
+        :param queue: Object to append messages to
         :type queue: Queueable | None
         """
         return self.bindQueue(queue)
@@ -302,15 +302,15 @@ class Station(ABC):
         The station will then try to append recieved messages to the
         supplied object, ot stop trying to append messages if the
         reference is to None.
-        
-        :param queue: Object to append messages to 
+
+        :param queue: Object to append messages to
         :type queue: Queueable | None
         """
         self.queue = queue
 
     def getLaunchFlag(self) -> bool:
         """Alias to the ``launch`` property for backward compatibility
-        
+
         :return: value of ``launch`` property
         :rtype: bool
         """
@@ -318,7 +318,7 @@ class Station(ABC):
 
     def getQDMFlag(self) -> bool:
         """Alias to the ``qdm`` property for backward compatibility
-        
+
         :return: value of ``qdm`` property
         :rtype: bool
         """
@@ -326,7 +326,7 @@ class Station(ABC):
 
     def getAbortFlag(self) -> bool:
         """Alias to the ``armed`` property for backward compatibility
-        
+
         :return: value of ``armed`` property
         :rtype: bool
         """
@@ -334,7 +334,7 @@ class Station(ABC):
 
     def getStabFlag(self) -> bool:
         """Alias to the ``stab`` property for backward compatibility
-        
+
         :return: value of ``stab`` property
         :rtype: bool
         """
@@ -342,7 +342,7 @@ class Station(ABC):
 
     def getArmedFlag(self) -> bool:
         """Alias to the ``armed`` property for backward compatibility
-        
+
         :return: value of ``armed`` property
         :rtype: bool
         """
@@ -356,8 +356,8 @@ class _AutoSendOnInterval(Thread):
         self, resend_func: Callable[[], None], interval: float, *a: Any, **kw: Any
     ) -> None:
         """Create a new _AutoSendInterval
-        
-        NOTE: This class should only ever be instantiated and interacted 
+
+        NOTE: This class should only ever be instantiated and interacted
         with through a ``Station``
 
         :param resend_func: Callback to resend the last state
@@ -371,7 +371,7 @@ class _AutoSendOnInterval(Thread):
         self.interval = interval
 
     def run(self) -> None:
-        """In a background thread, wait for an interval ampunt of time before calling the 
+        """In a background thread, wait for an interval ampunt of time before calling the
         callback until manually told to stop event is set
         """
         while not self.stop_event.wait(self.interval):
@@ -380,7 +380,7 @@ class _AutoSendOnInterval(Thread):
 
     def stop(self, timeout: float | None = None) -> None:
         """Method availble to other threads to stop interval sending
-        
+
         :param timeout: Time to wait for this thread to join. Time of 0
             or None means to wait forever
         :type timeout: float | None

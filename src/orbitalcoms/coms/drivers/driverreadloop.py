@@ -2,10 +2,10 @@ from __future__ import annotations
 
 import logging
 import multiprocessing as mp
+import traceback
 from multiprocessing.connection import Connection
 from threading import Event, Thread
 from typing import TYPE_CHECKING, Any, Callable, Tuple
-import traceback
 
 from ..._utils import log
 

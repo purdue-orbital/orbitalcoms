@@ -15,14 +15,14 @@ class ComsSubscriptionLike(Protocol):
 
     A ComsSubscriptionLike is a protocol that outlines how what a
     subscriber to a ComsDriver should look like. They are composed
-    of two parts: 
-    
+    of two parts:
+
     - An ``updaate`` method that describes what should be done with the incoming
       message or the data it contains.
-    - An ``expect_err`` property which let's the ComsDriver know whether or not the 
-      ``update`` is allowed to raise exceptions. If not the ComsSubsriberLike is 
+    - An ``expect_err`` property which let's the ComsDriver know whether or not the
+      ``update`` is allowed to raise exceptions. If not the ComsSubsriberLike is
       automatically un-subscribed from the ComsDriver.
-    
+
     A user can write their own Subscribers as long as the have the same
     shape as the ComsSubscriptionLike
     """
@@ -57,7 +57,7 @@ class ComsSubscription(ComsSubscriptionLike):
         :param message: Received message
         :type message: ComsMessage
         :param _: [UNUSED] ComsDriver instance that recieved the message
-        :type _: ComsDriver 
+        :type _: ComsDriver
         """
         self.on_update(message)
 
@@ -71,13 +71,13 @@ class OneTimeComsSubscription(ComsSubscription):
 
     def update(self, message: ComsMessage, driver: ComsDriver) -> None:
         """Calls the wrapped function and then imediatly unsubscribes
-        
+
         Overrides ComsSubscription.update
 
         :param message: Received message
         :type message: ComsMessage
         :param driver: ComsDriver instance that recieved the message
-        :type driver: ComsDriver 
+        :type driver: ComsDriver
         """
         super().update(message, driver)
         driver.unregister_subscriber(self)

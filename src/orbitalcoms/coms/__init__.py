@@ -7,7 +7,7 @@ from .strategies import (
     SerialComsStrategy,
     SocketComsStrategy,
 )
-from .subscribers import ComsSubscriptionLike, ComsSubscription, OneTimeComsSubscription
+from .subscribers import ComsSubscription, ComsSubscriptionLike, OneTimeComsSubscription
 
 __all__ = [
     "ComsDriver",

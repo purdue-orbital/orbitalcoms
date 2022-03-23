@@ -72,7 +72,7 @@ class ComsDriver:
         """Ends and deferences a the current readloop, effectively
         stopping the ComsDriver from recieving new messages.
 
-        :param timeout: The amount of time in seconds to wait for the 
+        :param timeout: The amount of time in seconds to wait for the
             read loop to join. If None, wait indefinitely
         :type timeout: float | None
         """
@@ -83,7 +83,7 @@ class ComsDriver:
 
     def _spawn_read_loop_thread(self) -> ComsDriverReadLoop:
         """Protected method for instancing a ComsDriverReadLoop.
-        
+
         :return: A thread capable of recieving new messages
         :rtype: ComsDriverReadLoop
         """
@@ -104,7 +104,7 @@ class ComsDriver:
         next ComsMessage that the readloop receives. This method
         takes an optional timeout parameter that will raise an exception
         if a message is not recieved within the designated time.
-        
+
         :param timeout: Time in second to wait for a message. If none
             is provied wait indefinitely
         :type timeout: float | None
@@ -132,7 +132,7 @@ class ComsDriver:
         """This method takes an object that can be parsed and used to
         construct a new ComsMessage. This message is then passed to a
         the ComsDriver communincation strategy to be sent to its counterpart.
-        
+
         :param m: Something that can be parsed and constructed into
             a ComsMessage
         :type m: ParasableComType
@@ -141,7 +141,7 @@ class ComsDriver:
         :type suppress_errors: bool
         :raises ComsDriverWriteError: If a message could not be constructed or
             if the constructed message could not be sent
-        :return: Wether the message was successfully sent 
+        :return: Wether the message was successfully sent
         :rtype: bool
         """
         try:

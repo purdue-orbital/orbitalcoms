@@ -1,4 +1,8 @@
-from .subscription import ComsSubscriptionLike, ComsSubscription, OneTimeComsSubscription
+from .subscription import (
+    ComsSubscription,
+    ComsSubscriptionLike,
+    OneTimeComsSubscription,
+)
 
 __all__ = [
     "ComsSubscriptionLike",
