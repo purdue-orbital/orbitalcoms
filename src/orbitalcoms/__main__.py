@@ -14,6 +14,7 @@ class BaseArgs(Protocol):
     """Base args that apply to launching orbitalcoms"""
 
     frontend: str
+    interval_send: int
     connection: str
 
 
@@ -50,10 +51,12 @@ def main() -> None:
     else:
         raise ValueError("Could not determine how to manage communication")
 
+    gs = GroundStation(coms)
+    gs.set_send_interval(args.interval_send)
     if args.frontend == "dev":
-        tkgui.run_app(GroundStation(coms))
+        tkgui.run_app(gs)
     elif args.frontend == "headless":
-        headless.run_app(GroundStation(coms))
+        headless.run_app(gs)
     else:
         raise ValueError("Failed to find selected frontend")
 
@@ -71,6 +74,13 @@ def get_args() -> BaseArgs:
         help="The frontend used for to dispaling ground sation information",
         default="dev",
         type=str,
+    )
+    parser.add_argument(
+        "--interval-send",
+        "-i",
+        help="number of seconds before auto-resending the latest message",
+        default=0,
+        type=int,
     )
     subparsers = parser.add_subparsers(
         title="Connection",
