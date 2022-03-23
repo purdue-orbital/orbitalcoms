@@ -246,8 +246,9 @@ class Station(ABC):
     def resend_last(self) -> None:
         """Attempts to resend the last send coms message"""
         if self._last_sent is not None:
-            self._coms.write(self._last_sent, suppress_errors=True)
-            self._on_send(self._last_sent)
+            if self._coms.write(self._last_sent, suppress_errors=True):
+                self._on_send(self._last_sent)
+                self._last_sent_time = time.time()
         else:
             # FIXME: This should send an all empty state message
             logger.warning("No previous message sent to interval again on interval")
