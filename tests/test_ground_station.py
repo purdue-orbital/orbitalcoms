@@ -3,7 +3,6 @@ import time
 from typing import List, Tuple
 
 import pytest
-from src.orbitalcoms import LaunchStation
 
 from orbitalcoms.coms.drivers.driver import ComsDriver
 from orbitalcoms.coms.messages.message import ComsMessage
