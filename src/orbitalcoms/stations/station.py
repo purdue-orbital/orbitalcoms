@@ -23,7 +23,31 @@ logger = make_logger(__name__, logging.WARNING)
 
 
 class Station(ABC):
+    """Abstract Base Class of for user facing API
+    
+    The ``Station`` class handles nitty gritty interaction with ComsDriver
+    for the users while providing conveniences such as the keeping track of
+     current mission flags.
+    
+    The ``Station`` keeps track of last sent and received ComsMessages
+    wholesale along with timestamps of their occurence for users to
+    be able to easily inspect and set their own mission state.
+
+    The Station is also provides addition functionality such as the
+    ability to automatically resend the current mission state after
+    a period of time has elapsed.
+    """
+
     def __init__(self, coms: ComsDriver, send_interval: float = 0.0):
+        """Create a new ``Station`` instance.
+
+        :param coms: Informs station how to handle communications
+        :type coms: ComsDriver
+        :param send_interval: Time to wait before autosending last state
+        :type send_interval: float
+        """
+
+
         self._coms = coms
 
         self._last_sent: ComsMessage | None = None
@@ -51,6 +75,11 @@ class Station(ABC):
         self._coms.start_read_loop()
 
     def __enter__(self) -> Station:
+        """Ctx manage a station
+        
+        Context meanaged stations will clean up their resources
+        on exiting of the context
+        """
         return self
 
     def __exit__(
@@ -59,6 +88,20 @@ class Station(ABC):
         exc_value: BaseException | None,
         tb: TracebackType | None,
     ) -> None:
+        """End of station in ctx managed state
+
+        Any and all exceptions are raised as is out of the ctx
+        
+        NOTE: Ctx managed stations cannot be used out of their
+        managed context
+
+        :param exc_type: [UNUSED] Type of raised exception
+        :type exc_type: Type[BaseException] | None
+        :param exc_value: [UNUSED] Value of rasied exception
+        :type exc_value: BaseException | None
+        :param tb: [UNUSED] Traceback
+        :type tb: TracebackType | None
+        """
         self.__cleanup()
 
     def __del__(self) -> None:
@@ -73,27 +116,51 @@ class Station(ABC):
     @property
     @abstractmethod
     def abort(self) -> bool:
-        """Station"""
+        """Current station abort property
+        
+        :returns: The boolean value of the station abort status
+        :rtype: bool
+        """
         ...
 
     @property
     @abstractmethod
     def qdm(self) -> bool:
+        """Current station QDM property
+        
+        :returns: The boolean value of the station QDM status
+        :rtype: bool
+        """
         ...
 
     @property
     @abstractmethod
     def stab(self) -> bool:
+        """Current station stabilize property
+        
+        :returns: The boolean value of the station stabilize status
+        :rtype: bool
+        """
         ...
 
     @property
     @abstractmethod
     def launch(self) -> bool:
+        """Current station launch property
+        
+        :returns: The boolean value of the station launch status
+        :rtype: bool
+        """
         ...
 
     @property
     @abstractmethod
     def armed(self) -> bool:
+        """Current station armed property
+        
+        :returns: The boolean value of the station armed status
+        :rtype: bool
+        """
         ...
 
     @property
@@ -102,18 +169,38 @@ class Station(ABC):
 
     @property
     def last_sent(self) -> ComsMessage | None:
+        """Returns the last message sent by station
+        
+        :returns: Last sent message
+        :rtype: ComsMessage | None
+        """
         return self._last_sent
 
     @property
     def last_received(self) -> ComsMessage | None:
+        """Returns the last message received by station
+        
+        :returns: Last received message
+        :rtype: ComsMessage | None
+        """
         return self._last_received
 
     @property
     def last_sent_time(self) -> float | None:
+        """Return the time of the last sent message as a float
+        
+        :returns: Last sent timestamp
+        :rtype: float | None
+        """
         return self._last_sent_time
 
     @property
     def last_received_time(self) -> float | None:
+        """Return the time of the last received message as a float
+        
+        :returns: Last received timestamp
+        :rtype: float | None
+        """
         return self._last_received_time
 
     def _on_receive(self, new: ComsMessage) -> Any:
@@ -157,6 +244,7 @@ class Station(ABC):
         return False
 
     def resend_last(self) -> None:
+        """Attempts to resend the last send coms message"""
         if self._last_sent is not None:
             self._coms.write(self._last_sent, suppress_errors=True)
             self._on_send(self._last_sent)
@@ -165,6 +253,12 @@ class Station(ABC):
             logger.warning("No previous message sent to interval again on interval")
 
     def set_send_interval(self, interval: float | None) -> None:
+        """Set the amount of time to be sent before the last state should be resent
+
+        :param interval: Time in seconds to wait before resending the last state.
+            An interval of 0 or None is means that interval sending is ended
+        :type interval: float
+        """
         if interval is not None and not isinstance(interval, (int, float)):
             raise TypeError("Expected interval of type `float` or `None`")
 
@@ -181,6 +275,7 @@ class Station(ABC):
         self._start_new_interval_send()
 
     def _start_new_interval_send(self) -> None:
+        """Creates an new thread to manage interval sending"""
         self._end_current_interval_send()
         if self._send_interval_time != 0:
             self._send_interval_thread = _AutoSendOnInterval(
@@ -189,11 +284,12 @@ class Station(ABC):
             self._send_interval_thread.start()
 
     def _end_current_interval_send(self) -> None:
+        """Stops and leans up the resources used by the current interval thread"""
         if self._send_interval_thread and self._send_interval_thread.is_alive():
             self._send_interval_thread.stop()
 
     def bind_queue(self, queue: Queueable | None) -> None:
-        """Alias for bindQueue
+        """Alias for ``bindQueue``
         
         :param queue: Object to append messages to 
         :type queue: Queueable | None
@@ -254,20 +350,41 @@ class Station(ABC):
 
 
 class _AutoSendOnInterval(Thread):
+    """Thread responsible for background interval sending last message"""
+
     def __init__(
         self, resend_func: Callable[[], None], interval: float, *a: Any, **kw: Any
     ) -> None:
+        """Create a new _AutoSendInterval
+        
+        NOTE: This class should only ever be instantiated and interacted 
+        with through a ``Station``
+
+        :param resend_func: Callback to resend the last state
+        :type resend_func: Callable[[], None]
+        :param interval: Amount of time to pass before calling the callback
+        :type interval: float
+        """
         super().__init__(*a, **kw)
         self.stop_event = Event()
         self.resend_func = resend_func
         self.interval = interval
 
     def run(self) -> None:
+        """In a background thread, wait for an interval ampunt of time before calling the 
+        callback until manually told to stop event is set
+        """
         while not self.stop_event.wait(self.interval):
             if not self.stop_event.is_set():
                 self.resend_func()
 
     def stop(self, timeout: float | None = None) -> None:
+        """Method availble to other threads to stop interval sending
+        
+        :param timeout: Time to wait for this thread to join. Time of 0
+            or None means to wait forever
+        :type timeout: float | None
+        """
         self.stop_event.set()
         self.join(timeout=timeout)
 
