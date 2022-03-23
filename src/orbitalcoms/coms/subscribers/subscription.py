@@ -35,6 +35,8 @@ class ComsSubscriptionLike(Protocol):
 
 
 class ComsSubscription(ComsSubscriptionLike):
+    """Wrapper class to turn a generic function into a ComsSubscriberLike"""
+
     def __init__(
         self,
         on_update: Callable[[ComsMessage], Any],
