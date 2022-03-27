@@ -15,25 +15,28 @@ OrbitalComs is a python package for managing communications between Purdue Orbit
 
 ## How to Install
 
+To get the most recent and up to date version of OrbitalComs and be on the cutting edge of development, we recomend installing the package directly from github. This can be done simply through pip, though you will need to have git installed.
+
 ```sh
 $ pip install 'git+https://github.com/purdue-orbital/orbitalcoms#egg=orbitalcoms'
 ```
 
+
 ## How to Use OrbitalComs
 
-As an app:
+OrbitalComs is a fully featured application capable of managing the commumications of a Purdue Orbital mission. OrbitalComs can be thought of as the kernal of a program where different user interfaces and communication strategies can be selected to fit a users needs.
+
+As such, OrbitalComs can be launched dricetly from the command line as a drop in Ground Station. For a brief help statment, from the enviormnet in which you installed OrbitalComs, simply enter:
+
 ```sh
-$ orbitalcoms [-h] [--frontend FRONTEND] [--interval-send INTERVAL_SEND] {socket,serial}
+$ orbitalcoms -h
 ```
+
+This will display the command line usage and options for usage. At its most basic usage, OribtalComs
 
 Example serial usage:
 ```sh
-$ orbitalcoms -f dev -i 120 serial --port /dev/ttyUSB0 --baudrate 9600
-```
-
-For more help:
-```sh
-$ orbitalcoms -h
+$ orbitalcoms -f headless -i 120 serial --port /dev/ttyUSB0 --baudrate 9600
 ```
 
 
@@ -62,24 +65,27 @@ message = {
   "STAB": 0,
   "QDM": 0,
   "DATA": {
-    "Anything": "trivially serializable to json",
+    "Anything": "JSON-able",
   },
 }
 LS.send(message)
 
 # Latest flags and data
 print(LS.abort)     # Prints True/False depending on what the GS has sent
-print(LS.last_data) # Prints "{'Anything': 'trivially serializable to json'}"
+print(LS.last_data) # Prints "{'Anything': 'JSON-able'}"
 
 # Automatically resend most recently sent message every 2 minutes
 LS.set_send_interval(120)
 ```
 
 ## Contributions
+
 OrbitalComs is an open source development project and as such all contributions are both welcome and highly appreciated. Below you will find information regarding how to get set up and start contributing.
 
 ### Set up
+
 First begin by forking or cloning the OrbitalComs repository. After having done, navigate to the created directory.
+
 ```sh
 $ git clone https://github.com/purdue-orbital/orbitalcoms.git orbitalcoms
 $ cd orbitalcoms
@@ -89,21 +95,29 @@ At this point it is highly recommended that you create a virtual environment so 
 You can create and activate a virtual environment using the following command.
 
 ```sh
-$ python3 -m venv venv && ./venv/bin/activate
+$ python3 -m venv venv && . venv/bin/activate
 ```
 
 Rember, this environment should be created using one of the versions of python supported by OrbitalComs.
 
-The next step is to install OrbitalComs in development mode. This can be done by hand by using pip
+The next step is to install OrbitalComs in development mode. This can be done by hand by using pip.
+
 ```sh
 $ pip install -e .[dev]
 ```
-or using the target in the Makefile, provided for convenience
+
+This can also be done by instead using the target in the Makefile, provided for convenience.
+
 ```sh
 $ make dev
 ```
 
-At this point you should be completely set up for development. As a test the command `python -c 'import orbitalcoms'` should not return an error, and running `make test` will give you a passing test suite.
+At this point you should be completely set up for development. As a test, you can try running the following the commands.
+
+```sh
+ $ python3 -c 'import orbitalcoms'  # should not return an error
+ $ make test                        # will run the test suite.
+ ```
 
 
 ### Contribution Guidelines
