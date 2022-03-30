@@ -64,6 +64,21 @@ def test_ls_send_interval(gs_and_ls, int_time, wait_time):
     assert len(q) == 3
 
 
+def test_interval_send_updates_last_sent_time(gs_and_ls):
+    _, ls = gs_and_ls
+    assert ls.last_sent_time is None
+
+    ls.send(ComsMessage(0, 0, 0, 0))
+    send_time = ls.last_sent_time
+    assert send_time is not None
+    assert isinstance(send_time, float)
+
+    ls.set_send_interval(2)
+    time.sleep(3)
+    ls.set_send_interval(None)  # Set interval to none to ensure it gets cleaned up
+    assert ls.last_sent_time > send_time
+
+
 def test_send_interval_is_stoppable(gs_and_ls):
     gs, ls = gs_and_ls
     q = []
