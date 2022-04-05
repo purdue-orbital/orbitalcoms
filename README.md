@@ -123,7 +123,8 @@ $ git clone https://github.com/purdue-orbital/orbitalcoms.git orbitalcoms
 $ cd orbitalcoms
 ```
 
-At this point it is highly recommended that you create a virtual environment so that your changes do not pollute your system version of python. This can be done using `virtualenv`, `conda` or some other environment manager, but the simplest solution is simply use the python `venv` module.
+At this point it is highly recommended that you create a virtual environment so that your changes do not pollute your system version of python. This can be done using `virtualenv`, `conda`, or some other environment manager, but the simplest solution is simply use the python `venv` module.
+
 You can create and activate a virtual environment using the following command.
 
 ```sh
@@ -154,5 +155,16 @@ At this point you should be completely set up for development. As a test, you ca
 
 ### Contribution Guidelines
 
-TODO
+Once you have made your changes to the code and ready to push it back into the code base, there are few things you should check before you open a pull request:
+
+  1. Your code should be well tested. If you have modified existing code the existing test suite should pass. If you have added new functionality you should have written new tests under the `tests` directory. Running `make test` should result in a passing test suite and `make test-cov` should not result in a code coverage under 80%
+
+  2. Your code should be well documented. All user facing classes and methods should have docstrings explaining what they do. If a method is too complicated to explain in a reasonable length consider breaking it into sub-methods. Remember to abide by SOLID and DRY principles when possible. If, and only if, it is not trivial to tell what a block of code is doing, add some in line comments. DO NOT OVER COMMENT YOUR CODE. Comments should explain 'why' not 'how' your code works.
+
+  3. Your code should be typed. OrbitalComs is a statically typed package and should be able to pass a strict static analysis from `make type`. In the very rare case it is absolutely necessary to opt out of the type checking system, be sure to leave a comment beside where that is done to explain why.
+
+  4. Your code should be styled. Be sure to run `make style-all` to style your code and test suite to OrbitalComs standards and address any errors that may be reported during this step.
+
+If you have made it this far, it looks like you are ready to open a new pull request. On Github, open a new PR merging your branch into `orbitalcoms/develop`, attach any issues you may have been addressing, and request a review from a qualified reviewer. Our reviewers will look over your code and request changes as they see fit. Once it has met their satisfaction, they will approve your changes and you will be able to merge your branch.
+
 
