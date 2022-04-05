@@ -24,9 +24,9 @@ $ pip install 'git+https://github.com/purdue-orbital/orbitalcoms#egg=orbitalcoms
 
 ## How to Use OrbitalComs
 
-OrbitalComs is a fully featured application capable of managing the commumications of a Purdue Orbital mission. OrbitalComs can be thought of as the kernal of a program where different user interfaces and communication strategies can be selected to fit a users needs.
+OrbitalComs is a fully featured application capable of managing the communications of a Purdue Orbital mission. OrbitalComs can be thought of as the kernel of a program where different user interfaces and communication strategies can be selected to fit a user's needs.
 
-As such, OrbitalComs can be launched dricetly from the command line as a drop in Ground Station. For a brief help statment, from the enviormnet in which you installed OrbitalComs, simply enter:
+As such, OrbitalComs can be launched directly from the command line as a drop in Ground Station. For a brief help statement, from the environment in which you installed OrbitalComs, simply enter:
 
 ```sh
 $ orbitalcoms -h
@@ -42,22 +42,40 @@ $ orbitalcoms -f headless -i 120 serial --port /dev/ttyUSB0 --baudrate 9600
 
 ## Usage in a Script
 
-In a script:
+In addition to the command line interface, OrbitalComs is capable of being imported into an existing python project to manage communications. This is most commonly done when a script running on the Launch Station needs to communicate with the ground station. To show how this is done, let's build a very simplistic launch station script capable of communicating with the OrbitalComs command line app.
+
+The first thing that we need to do is import OrbitalComs and create an instance of a Launch Station using a serial interface to facilitate communications throughout the mission over a serial connection. Luckily OrbitalComs provides a host of common use constructor functions to be used from the get-go.
+
 ```py
 from orbitalcoms import create_serial_launch_station
 
 # Creating a new Launch Station in a script
 LS = create_serial_launch_station(port="/dev/ttyUSB0", baudrate=9600)
+```
 
+Next we need to make sure that our Launch Station can receive and process messages sent from the Ground Station. We can do this by binding a list to the Launch Station where incoming messages will be queued.
+
+
+```py
 # Set up to receive messages
 message_queue = []
 LS.bind_queue(message_queue)
+```
 
+We can now process incoming messages by simply checking if the `message_queue` list is populated, and we can process them in the order that they were received by simply popping messages from the beginning of the list:
+
+```py
 # Checking for new messages
 if message_queue:
-  print(message_queue.pop(0))
+    print(message_queue.pop(0))
+```
 
-# Sending a message
+We also want to be able to send our own messages back to the Ground Station. OrbitalComs Stations will take any `ComsMessage`, message conforming dictionary, or message conforming JSON-like string, and try to coerce it into a ComsMessage to be sent.
+
+In a script:
+```py
+
+# Formulate a message
 message = {
   "ARMED": 1,
   "ABORT": 0,
@@ -68,19 +86,33 @@ message = {
     "Anything": "JSON-able",
   },
 }
-LS.send(message)
 
+# Send it to the GS
+LS.send(message)
+```
+
+We may also want to be able to check on the progress of a mission without needing to wait for new incoming messages or cluttering our code with excess variables to keep track of state. Luckily, OrbitalComs Stations will keep track of mission progress internally and can be queried by simply checking the corresponding properties on the Station.
+
+Note that in general, OrbitalComs will assume that the Ground Station is the source of truth for mission progress and state, and the Launch Stations is the source of truth for the latest and most accurate data.
+
+```py
 # Latest flags and data
 print(LS.abort)     # Prints True/False depending on what the GS has sent
 print(LS.last_data) # Prints "{'Anything': 'JSON-able'}"
+```
 
+Finally, we may want to automatically send our mission state to the Ground Station automatically after some interval of time. This can be tricky, especially if we need to manage multiple threads, processes, or any sort of asynchronous code. Luckily this is a pre-built functionality with OrbitalComs and we can automatically set up our station to resend the most recently sent message every 2 minutes with the following line of code.
+
+```py
 # Automatically resend most recently sent message every 2 minutes
 LS.set_send_interval(120)
 ```
 
+
 ## Contributions
 
 OrbitalComs is an open source development project and as such all contributions are both welcome and highly appreciated. Below you will find information regarding how to get set up and start contributing.
+
 
 ### Set up
 
@@ -112,7 +144,7 @@ This can also be done by instead using the target in the Makefile, provided for 
 $ make dev
 ```
 
-At this point you should be completely set up for development. As a test, you can try running the following the commands.
+At this point you should be completely set up for development. As a test, you can try running the following commands.
 
 ```sh
  $ python3 -c 'import orbitalcoms'  # should not return an error
@@ -123,3 +155,4 @@ At this point you should be completely set up for development. As a test, you ca
 ### Contribution Guidelines
 
 TODO
+
