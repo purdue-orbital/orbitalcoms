@@ -177,12 +177,12 @@ def test_gs_recv_time(gs_and_loc: Tuple[GroundStation, ComsDriver]):
     assert gs.last_received_time is None
 
     assert loc.write(ComsMessage(0, 0, 0, 0, ARMED=1))
-    time.sleep(0.2)
+    time.sleep(0.4)
     assert isinstance(gs.last_received_time, float)
     last_recv = gs.last_received_time
 
     loc.write(ComsMessage(0, 0, 0, 0, ARMED=1))
-    time.sleep(0.2)
+    time.sleep(0.4)
     assert last_recv != gs.last_received_time
 
 

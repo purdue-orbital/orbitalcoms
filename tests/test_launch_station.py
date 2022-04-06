@@ -123,12 +123,12 @@ def test_gs_recv_time(ls_and_loc: Tuple[LaunchStation, ComsDriver]):
     assert ls.last_received_time is None
 
     assert loc.write(ComsMessage(0, 0, 0, 0, ARMED=1))
-    time.sleep(0.2)
+    time.sleep(0.4)
     assert isinstance(ls.last_received_time, float)
     last_recv = ls.last_received_time
 
     loc.write(ComsMessage(0, 0, 0, 0, ARMED=1))
-    time.sleep(0.2)
+    time.sleep(0.4)
     assert last_recv != ls.last_received_time
 
 
