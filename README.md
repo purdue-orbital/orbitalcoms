@@ -72,9 +72,7 @@ if message_queue:
 
 We also want to be able to send our own messages back to the Ground Station. OrbitalComs Stations will take any `ComsMessage`, message conforming dictionary, or message conforming JSON-like string, and try to coerce it into a ComsMessage to be sent.
 
-In a script:
 ```py
-
 # Formulate a message
 message = {
   "ARMED": 1,
