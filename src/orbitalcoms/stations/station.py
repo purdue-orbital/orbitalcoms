@@ -27,7 +27,7 @@ class Station(ABC):
 
     The ``Station`` class handles nitty gritty interaction with ComsDriver
     for the users while providing conveniences such as the keeping track of
-     current mission flags.
+    current mission flags.
 
     The ``Station`` keeps track of last sent and received ComsMessages
     wholesale along with timestamps of their occurence for users to
