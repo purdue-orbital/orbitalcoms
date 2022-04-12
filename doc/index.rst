@@ -10,12 +10,7 @@ Welcome to OrbitalComs's documentation!
    :maxdepth: 2
    :caption: Contents:
 
-
-.. toctree::
-   :maxdepth: 2
-   :caption: OrbitalComs:
-
-   api/orbitalcoms   
+   api/user-facing   
 
 
 
