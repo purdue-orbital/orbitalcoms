@@ -7,13 +7,18 @@ from __future__ import annotations
 
 import datetime
 import json
+import logging
 import tkinter as tk
 from typing import TYPE_CHECKING, Any
 
+from orbitalcoms._utils.log import make_logger
 from orbitalcoms.coms.messages.message import ComsMessage
 
 if TYPE_CHECKING:
     from ..stations.groundstation import GroundStation
+
+
+_logger = make_logger(__name__, logging.INFO)
 
 
 class GroundStationFrame(tk.Frame):
@@ -42,6 +47,13 @@ class GroundStationFrame(tk.Frame):
         self.columnconfigure(index=1, weight=1, uniform="1")
         self.columnconfigure(index=2, weight=1, uniform="1")
         self.columnconfigure(index=3, weight=1, uniform="1")
+
+        self.menu = tk.Menu(self.master)
+        danger_menu = tk.Menu(self.menu)
+        danger_menu.add_command(label="Reset Read Proc", command=self.reset_read_proc)
+        danger_menu.add_command(label="Resend Last Msg", command=self.resend_last)
+        self.menu.add_cascade(label="DANGER", menu=danger_menu)
+        self.master.configure(menu=self.menu)
 
         # Buttons
         self.btn_arm = tk.Button(
@@ -126,6 +138,17 @@ class GroundStationFrame(tk.Frame):
         except Exception:
             data_str = str(self._gs.data)
         self.txt_data.insert(1.0, f"DATA:\n====\n{data_str}")
+
+    def reset_read_proc(self):
+        _logger.warning("--> Reseting ComsDriver Read Proc")
+        self._gs._coms.end_read_loop(timeout=10)
+        self._gs._coms.start_read_loop()
+        _logger.warning("<-- ComsDriver Read Proc Reset!")
+
+    def resend_last(self):
+        _logger.warning("--> Resending Last Msg")
+        self._gs.send(self._gs.last_sent)
+        _logger.warning("<-- Last Msg Resent!")
 
 
 def run_app(gs: GroundStation) -> None:
