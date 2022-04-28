@@ -5,7 +5,6 @@ from multiprocessing import Lock
 
 import serial
 
-from orbitalcoms import ComsDriverReadError
 from orbitalcoms.coms.errors.errors import ComsMessageParseError
 
 from ..messages import ComsMessage, construct_message
