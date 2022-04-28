@@ -50,13 +50,12 @@ class SerialComsStrategy(ComsStrategy):
         msg = ""
         while self.ser.is_open:
             if self.ser.in_waiting:
-                self._lock.acquire()
-                c = self.ser.read().decode(encoding=self.__ENCODING, errors="ignore")
-                self._lock.release()
-                if c == "\r":
-                    return construct_message(msg)
-                else:
-                    msg += c
+                with self._lock:
+                    c = self.ser.read().decode(encoding=self.__ENCODING, errors="ignore")
+                    if c == "\r":
+                        return construct_message(msg)
+                    else:
+                        msg += c
             else:
                 time.sleep(0.2)  # TODO: make this accessable to change by user
 
@@ -67,11 +66,10 @@ class SerialComsStrategy(ComsStrategy):
         :param m: A message to write to the wrapped socket
         :type m: ComsMessage
         """
-        self._lock.acquire()
-        self.ser.write(self._preprocess_write_msg(m))
-        if self.ser.out_waiting:
-            self.ser.flush()
-        self._lock.release()
+        with self._lock:
+            self.ser.write(self._preprocess_write_msg(m))
+            if self.ser.out_waiting:
+                self.ser.flush()
 
     @classmethod
     def _preprocess_write_msg(cls, m: ComsMessage) -> bytes:
