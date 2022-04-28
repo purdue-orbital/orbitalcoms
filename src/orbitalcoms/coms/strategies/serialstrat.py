@@ -1,11 +1,15 @@
 from __future__ import annotations
+
 import time
+from multiprocessing import Lock
 
 import serial
 
+from orbitalcoms import ComsDriverReadError
+from orbitalcoms.coms.errors.errors import ComsMessageParseError
+
 from ..messages import ComsMessage, construct_message
 from .strategy import ComsStrategy
-from multiprocessing import Lock
 
 
 class SerialComsStrategy(ComsStrategy):
@@ -24,7 +28,7 @@ class SerialComsStrategy(ComsStrategy):
         if not self.ser.is_open:
             self.ser.open()
 
-    def __del__(self):
+    def __del__(self) -> None:
         self._shutdown()
 
     @classmethod
@@ -51,13 +55,18 @@ class SerialComsStrategy(ComsStrategy):
         while self.ser.is_open:
             if self.ser.in_waiting:
                 with self._lock:
-                    c = self.ser.read().decode(encoding=self.__ENCODING, errors="ignore")
+                    c = self.ser.read().decode(
+                        encoding=self.__ENCODING, errors="ignore"
+                    )
                     if c == "\r":
                         return construct_message(msg)
                     else:
                         msg += c
             else:
                 time.sleep(0.2)  # TODO: make this accessable to change by user
+        raise ComsMessageParseError(
+            "Failed to read a message before serial port was closed"
+        )
 
     def write(self, m: ComsMessage) -> None:
         """Turn a ComsMessage into bytes, format them and send over the wrapped
@@ -82,7 +91,7 @@ class SerialComsStrategy(ComsStrategy):
         """
         return f"{m.as_str}\r".encode(encoding=cls.__ENCODING)
 
-    def _shutdown(self):
+    def _shutdown(self) -> None:
         """Method to close the serial connection"""
         if self.ser.is_open:
             self.ser.close()

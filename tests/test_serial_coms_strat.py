@@ -12,6 +12,7 @@ else:
 
 import os
 import time
+
 import serial
 
 from orbitalcoms.coms.drivers.driver import ComsDriver
@@ -36,12 +37,14 @@ def test_open_on_cunstruct(pseudotty):
     scs = SerialComsStrategy(ser)
     assert scs.ser.is_open
 
+
 def test_close_on_shutdown(pseudotty):
     m, _ = pseudotty
     m_name = os.ttyname(m)
     scs = SerialComsStrategy.from_args(m_name, 9600)
     scs._shutdown()
     assert not scs.ser.is_open
+
 
 def test_port_access(pseudotty):
     m, _ = pseudotty
