@@ -7,6 +7,7 @@ from ..messages import ComsMessage, construct_message
 from .strategy import ComsStrategy
 from multiprocessing import Lock
 
+
 class SerialComsStrategy(ComsStrategy):
     """Informs how to communicate over a serial port"""
 
@@ -20,6 +21,11 @@ class SerialComsStrategy(ComsStrategy):
         """
         self.ser = serial
         self._lock = Lock()
+        if not self.ser.is_open:
+            self.ser.open()
+
+    def __del__(self):
+        self._shutdown()
 
     @classmethod
     def from_args(cls, port: str, baudrate: int) -> SerialComsStrategy:
@@ -42,17 +48,17 @@ class SerialComsStrategy(ComsStrategy):
         :rtype: ComsMessage
         """
         msg = ""
-        while True:
+        while self.ser.is_open:
             if self.ser.in_waiting:
                 self._lock.acquire()
                 c = self.ser.read().decode(encoding=self.__ENCODING, errors="ignore")
                 self._lock.release()
-                if c == "&":
+                if c == "\r":
                     return construct_message(msg)
                 else:
                     msg += c
             else:
-                time.sleep(0.5)
+                time.sleep(0.2)  # TODO: make this accessable to change by user
 
     def write(self, m: ComsMessage) -> None:
         """Turn a ComsMessage into bytes, format them and send over the wrapped
@@ -63,7 +69,8 @@ class SerialComsStrategy(ComsStrategy):
         """
         self._lock.acquire()
         self.ser.write(self._preprocess_write_msg(m))
-        self.ser.flush()
+        if self.ser.out_waiting:
+            self.ser.flush()
         self._lock.release()
 
     @classmethod
@@ -75,4 +82,9 @@ class SerialComsStrategy(ComsStrategy):
         :returns: A formated bytes representation the message
         :rtype: bytes
         """
-        return f"{m.as_str}&".encode(encoding=cls.__ENCODING)
+        return f"{m.as_str}\r".encode(encoding=cls.__ENCODING)
+
+    def _shutdown(self):
+        """Method to close the serial connection"""
+        if self.ser.is_open:
+            self.ser.close()
