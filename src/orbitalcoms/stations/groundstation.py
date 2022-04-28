@@ -83,7 +83,8 @@ class GroundStation(Station):
         return bool(self.last_sent.ARMED)
 
     def _is_valid_state_change(self, new: ComsMessage) -> bool:
-        """Validate that message be sent is preoforming a valid mission state change
+        """Validate that the message being sent is preforming a valid mission
+        state change
 
         Because the ``GroundStation`` is responsible for the overall controll flow
         of a mission it will validate that any sent messages are making a valid
