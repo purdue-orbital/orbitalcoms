@@ -109,10 +109,10 @@ class Station(ABC):
 
     def close(self):
         """User facing method to dealloc resources.
-        
+
         NOTE: A station cannot be used after it has been closed
         """
-        self.__cleanup() 
+        self.__cleanup()
 
     def __cleanup(self) -> None:
         """Clean up resources used by the station"""
@@ -258,7 +258,9 @@ class Station(ABC):
                 self._last_sent_time = time.time()
         else:
             # FIXME: This should send an all empty state message
-            logger.warning("No previous message sent to interval again on interval")
+            logger.warning(
+                "Cannot send previous message (No previous message has been sent)"
+            )
 
     def set_send_interval(self, interval: float | None) -> None:
         """Set the amount of time to be sent before the last state should be resent
