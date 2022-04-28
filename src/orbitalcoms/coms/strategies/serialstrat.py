@@ -1,10 +1,11 @@
 from __future__ import annotations
+import time
 
 import serial
 
 from ..messages import ComsMessage, construct_message
 from .strategy import ComsStrategy
-
+from multiprocessing import Lock
 
 class SerialComsStrategy(ComsStrategy):
     """Informs how to communicate over a serial port"""
@@ -18,6 +19,7 @@ class SerialComsStrategy(ComsStrategy):
         :type serial: serial.Serial
         """
         self.ser = serial
+        self._lock = Lock()
 
     @classmethod
     def from_args(cls, port: str, baudrate: int) -> SerialComsStrategy:
@@ -41,11 +43,16 @@ class SerialComsStrategy(ComsStrategy):
         """
         msg = ""
         while True:
-            c = self.ser.read().decode(encoding=self.__ENCODING, errors="ignore")
-            if c == "&":
-                return construct_message(msg)
+            if self.ser.in_waiting:
+                self._lock.acquire()
+                c = self.ser.read().decode(encoding=self.__ENCODING, errors="ignore")
+                self._lock.release()
+                if c == "&":
+                    return construct_message(msg)
+                else:
+                    msg += c
             else:
-                msg += c
+                time.sleep(0.5)
 
     def write(self, m: ComsMessage) -> None:
         """Turn a ComsMessage into bytes, format them and send over the wrapped
@@ -54,9 +61,10 @@ class SerialComsStrategy(ComsStrategy):
         :param m: A message to write to the wrapped socket
         :type m: ComsMessage
         """
+        self._lock.acquire()
         self.ser.write(self._preprocess_write_msg(m))
-        if self.ser.in_waiting:
-            self.ser.flush()
+        self.ser.flush()
+        self._lock.release()
 
     @classmethod
     def _preprocess_write_msg(cls, m: ComsMessage) -> bytes:
