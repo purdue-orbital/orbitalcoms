@@ -101,11 +101,18 @@ class Station(ABC):
         :param tb: [UNUSED] Traceback
         :type tb: TracebackType | None
         """
-        self.__cleanup()
+        self.close()
 
     def __del__(self) -> None:
         """Deconstruct Station"""
         self.__cleanup()
+
+    def close(self):
+        """User facing method to dealloc resources.
+        
+        NOTE: A station cannot be used after it has been closed
+        """
+        self.__cleanup() 
 
     def __cleanup(self) -> None:
         """Clean up resources used by the station"""

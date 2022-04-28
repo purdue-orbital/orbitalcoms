@@ -9,6 +9,7 @@ import datetime
 import json
 import logging
 import tkinter as tk
+from tkinter import messagebox
 import traceback
 from typing import TYPE_CHECKING, Any
 
@@ -35,6 +36,8 @@ class GroundStationFrame(tk.Frame):
         super().__init__(*args, **kwargs)
         self._gs = gs
         self._gs.bind_queue(GroundStationFrame.FrameUpdateQueue(self))
+        
+        # Config Window
         self.grid(column=0, row=0, sticky="nsew")
         self.master.columnconfigure(index=0, weight=1)
         self.master.rowconfigure(index=0, weight=1)
@@ -50,6 +53,7 @@ class GroundStationFrame(tk.Frame):
         self.columnconfigure(index=2, weight=1, uniform="1")
         self.columnconfigure(index=3, weight=1, uniform="1")
 
+        # Menus
         self.menu = tk.Menu(self.master)
         danger_menu = tk.Menu(self.menu)
         danger_menu.add_command(label="Reset Read Proc", command=self.reset_read_proc)
@@ -89,6 +93,10 @@ class GroundStationFrame(tk.Frame):
         self.txt_recv.grid(column=2, row=0, rowspan=5, sticky="nsew")
         self.txt_data.grid(column=3, row=0, rowspan=5, sticky="nsew")
 
+        # Protocols
+        self.master.protocol("WM_DELETE_WINDOW", self._on_close)
+
+        # Start Display
         self.update_disp()
 
     def send_state(self, update: str) -> None:
@@ -156,6 +164,17 @@ class GroundStationFrame(tk.Frame):
             except ComsDriverWriteError:
                 traceback.print_exc()
         _logger.warning("<-- Last Msg Resent!")
+
+    def _on_close(self):
+        if messagebox.askyesno(
+            "Quit",
+            "Are you sure you want to close the Dev GUI?",
+        ):
+            self._shutdown()
+
+    def _shutdown(self):
+        self._gs.close()
+        self.master.destroy()
 
 
 def run_app(gs: GroundStation) -> None:
