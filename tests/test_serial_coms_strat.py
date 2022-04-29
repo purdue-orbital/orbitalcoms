@@ -29,7 +29,7 @@ def pseudotty():
     os.close(s)
 
 
-def test_open_on_cunstruct(pseudotty):
+def test_open_on_construct(pseudotty):
     m, _ = pseudotty
     m_name = os.ttyname(m)
     ser = serial.Serial(port=m_name, baudrate=9600)
