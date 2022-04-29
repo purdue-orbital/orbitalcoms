@@ -9,9 +9,8 @@ from typing import TYPE_CHECKING
 from pynput import keyboard
 from pynput.keyboard import Key, KeyCode
 
-from orbitalcoms.coms.messages.message import ComsMessage
-
 from ..coms import messages
+from ..coms.messages.message import ComsMessage
 
 if TYPE_CHECKING:
     from orbitalcoms.stations.groundstation import GroundStation
