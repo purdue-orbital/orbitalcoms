@@ -9,13 +9,13 @@ import datetime
 import json
 import logging
 import tkinter as tk
-from tkinter import messagebox
 import traceback
+from tkinter import messagebox
 from typing import TYPE_CHECKING, Any
 
-from orbitalcoms import ComsDriverWriteError
-from orbitalcoms._utils.log import make_logger
-from orbitalcoms.coms.messages.message import ComsMessage
+from .._utils.log import make_logger
+from ..coms.errors import ComsDriverWriteError
+from ..coms.messages.message import ComsMessage
 
 if TYPE_CHECKING:
     from ..stations.groundstation import GroundStation
@@ -36,7 +36,7 @@ class GroundStationFrame(tk.Frame):
         super().__init__(*args, **kwargs)
         self._gs = gs
         self._gs.bind_queue(GroundStationFrame.FrameUpdateQueue(self))
-        
+
         # Config Window
         self.grid(column=0, row=0, sticky="nsew")
         self.master.columnconfigure(index=0, weight=1)
@@ -92,9 +92,6 @@ class GroundStationFrame(tk.Frame):
         self.txt_sent.grid(column=1, row=0, rowspan=5, sticky="nsew")
         self.txt_recv.grid(column=2, row=0, rowspan=5, sticky="nsew")
         self.txt_data.grid(column=3, row=0, rowspan=5, sticky="nsew")
-
-        # Protocols
-        self.master.protocol("WM_DELETE_WINDOW", self._on_close)
 
         # Start Display
         self.update_disp()
@@ -165,17 +162,6 @@ class GroundStationFrame(tk.Frame):
                 traceback.print_exc()
         _logger.warning("<-- Last Msg Resent!")
 
-    def _on_close(self):
-        if messagebox.askyesno(
-            "Quit",
-            "Are you sure you want to close the Dev GUI?",
-        ):
-            self._shutdown()
-
-    def _shutdown(self):
-        self._gs.close()
-        self.master.destroy()
-
 
 def run_app(gs: GroundStation) -> None:
     root = tk.Tk()
@@ -183,5 +169,19 @@ def run_app(gs: GroundStation) -> None:
     width = 800
     height = 600
     root.geometry(f"{width}x{height}")
+
     gs_gui = GroundStationFrame(gs, master=root)
+
+    # Top level protocols
+    def on_close() -> None:
+        if messagebox.askyesno(
+            "Quit",
+            "Are you sure you want to close the Dev GUI?",
+        ):
+            gs.close()
+            root.destroy()
+
+    # Bind Protocols
+    root.protocol("WM_DELETE_WINDOW", on_close)
+
     gs_gui.mainloop()

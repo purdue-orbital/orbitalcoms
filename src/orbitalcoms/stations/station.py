@@ -107,7 +107,7 @@ class Station(ABC):
         """Deconstruct Station"""
         self.__cleanup()
 
-    def close(self):
+    def close(self) -> None:
         """User facing method to dealloc resources.
 
         NOTE: A station cannot be used after it has been closed
