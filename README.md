@@ -2,12 +2,15 @@
   <img src="https://images.squarespace-cdn.com/content/v1/56ce2044d210b8716143af3a/1521699104186-NCS4AA7ZIS0HFGQP1VMZ/Logo1.png?format=1500w">
 </p>
 
+<div align="center">
 
-[![Python](https://img.shields.io/badge/Python-3776AB?logo=python&logoColor=white)](https://www.python.org/)
-[![Code Style](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
-[![Maintainer](https://img.shields.io/badge/Maintainer-purdue--orbital-brightgreen)](https://github.com/purdue-orbital)
-![GitHub Last Commit](https://img.shields.io/github/last-commit/purdue-orbital/orbitalcoms)
-![Tests](https://github.com/purdue-orbital/orbitalcoms/actions/workflows/tests.yml/badge.svg)
+  <a>[![Python](https://img.shields.io/badge/Python-3776AB?logo=python&logoColor=white)](https://www.python.org/)</a>
+  <a>[![Code Style](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)</a>
+  <a>[![Maintainer](https://img.shields.io/badge/Maintainer-purdue--orbital-brightgreen)](https://github.com/purdue-orbital)</a>
+  <a>![GitHub Last Commit](https://img.shields.io/github/last-commit/purdue-orbital/orbitalcoms)</a>
+  <a>![Tests](https://github.com/purdue-orbital/orbitalcoms/actions/workflows/tests.yml/badge.svg)</a>
+
+</div>
 
 # OrbitalComs
 
@@ -15,10 +18,16 @@ OrbitalComs is a python package for managing communications between Purdue Orbit
 
 ## How to Install
 
-To get the most recent and up to date version of OrbitalComs and be on the cutting edge of development, we recomend installing the package directly from github. This can be done simply through pip, though you will need to have git installed.
+OrbitalComs is currently distributed through pip from our GitHub repository. To get the most recently released version of OrbitalComs, simply install the latest tagged version. You can do this with the following command, though it will require that git is installed.
 
 ```sh
-$ pip install 'git+https://github.com/purdue-orbital/orbitalcoms#egg=orbitalcoms'
+$ pip install 'git+https://github.com/purdue-orbital/orbitalcoms@v0.1.0#egg=orbitalcoms'
+```
+
+To get the most recent changes to OrbitalComs and be on the cutting edge of development, we recommend installing the package directly from our development branch. This can be done with the following command, and will also require git.
+
+```sh
+$ pip install 'git+https://github.com/purdue-orbital/orbitalcoms@develop#egg=orbitalcoms'
 ```
 
 
@@ -70,7 +79,7 @@ if message_queue:
     print(message_queue.pop(0))
 ```
 
-We also want to be able to send our own messages back to the Ground Station. OrbitalComs Stations will take any `ComsMessage`, message conforming dictionary, or message conforming JSON-like string, and try to coerce it into a ComsMessage to be sent.
+We also want to be able to send our own messages back to the Ground Station. OrbitalComs Stations will take any `ComsMessage`, message conforming dictionary, or message conforming JSON-like string, and try to coerce it into a `ComsMessage` to be sent.
 
 ```py
 # Formulate a message
@@ -164,5 +173,7 @@ Once you have made your changes to the code and ready to push it back into the c
   4. Your code should be styled. Be sure to run `make style-all` to style your code and test suite to OrbitalComs standards and address any errors that may be reported during this step.
 
 If you have made it this far, it looks like you are ready to open a new pull request. On Github, open a new PR merging your branch into `orbitalcoms/develop`, attach any issues you may have been addressing, and request a review from a qualified reviewer. Our reviewers will look over your code and request changes as they see fit. Once it has met their satisfaction, they will approve your changes and you will be able to merge your branch.
+
+
 
 
