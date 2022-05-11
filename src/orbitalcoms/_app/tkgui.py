@@ -7,13 +7,21 @@ from __future__ import annotations
 
 import datetime
 import json
+import logging
 import tkinter as tk
+import traceback
+from tkinter import messagebox
 from typing import TYPE_CHECKING, Any
 
-from orbitalcoms.coms.messages.message import ComsMessage
+from .._utils.log import make_logger
+from ..coms.errors import ComsDriverWriteError
+from ..coms.messages.message import ComsMessage
 
 if TYPE_CHECKING:
     from ..stations.groundstation import GroundStation
+
+
+_logger = make_logger(__name__, logging.INFO)
 
 
 class GroundStationFrame(tk.Frame):
@@ -28,6 +36,8 @@ class GroundStationFrame(tk.Frame):
         super().__init__(*args, **kwargs)
         self._gs = gs
         self._gs.bind_queue(GroundStationFrame.FrameUpdateQueue(self))
+
+        # Config Window
         self.grid(column=0, row=0, sticky="nsew")
         self.master.columnconfigure(index=0, weight=1)
         self.master.rowconfigure(index=0, weight=1)
@@ -42,6 +52,14 @@ class GroundStationFrame(tk.Frame):
         self.columnconfigure(index=1, weight=1, uniform="1")
         self.columnconfigure(index=2, weight=1, uniform="1")
         self.columnconfigure(index=3, weight=1, uniform="1")
+
+        # Menus
+        self.menu = tk.Menu(self.master)
+        danger_menu = tk.Menu(self.menu)
+        danger_menu.add_command(label="Reset Read Proc", command=self.reset_read_proc)
+        danger_menu.add_command(label="Resend Last Msg", command=self.resend_last)
+        self.menu.add_cascade(label="DANGER", menu=danger_menu)
+        self.master.configure(menu=self.menu)  # type: ignore
 
         # Buttons
         self.btn_arm = tk.Button(
@@ -75,6 +93,7 @@ class GroundStationFrame(tk.Frame):
         self.txt_recv.grid(column=2, row=0, rowspan=5, sticky="nsew")
         self.txt_data.grid(column=3, row=0, rowspan=5, sticky="nsew")
 
+        # Start Display
         self.update_disp()
 
     def send_state(self, update: str) -> None:
@@ -127,6 +146,22 @@ class GroundStationFrame(tk.Frame):
             data_str = str(self._gs.data)
         self.txt_data.insert(1.0, f"DATA:\n====\n{data_str}")
 
+    def reset_read_proc(self) -> None:
+        _logger.warning("--> Reseting ComsDriver Read Proc")
+        self._gs._coms.end_read_loop(timeout=10)
+        self._gs._coms.start_read_loop()
+        _logger.warning("<-- ComsDriver Read Proc Reset!")
+
+    def resend_last(self) -> None:
+        _logger.warning("--> Resending Last Msg")
+        last = self._gs.last_sent
+        if last is not None:
+            try:
+                self._gs._coms.write(last)
+            except ComsDriverWriteError:
+                traceback.print_exc()
+        _logger.warning("<-- Last Msg Resent!")
+
 
 def run_app(gs: GroundStation) -> None:
     root = tk.Tk()
@@ -134,5 +169,19 @@ def run_app(gs: GroundStation) -> None:
     width = 800
     height = 600
     root.geometry(f"{width}x{height}")
+
     gs_gui = GroundStationFrame(gs, master=root)
+
+    # Top level protocols
+    def on_close() -> None:
+        if messagebox.askyesno(
+            "Quit",
+            "Are you sure you want to close the Dev GUI?",
+        ):
+            gs.close()
+            root.destroy()
+
+    # Bind Protocols
+    root.protocol("WM_DELETE_WINDOW", on_close)
+
     gs_gui.mainloop()

@@ -13,6 +13,8 @@ else:
 import os
 import time
 
+import serial
+
 from orbitalcoms.coms.drivers.driver import ComsDriver
 from orbitalcoms.coms.messages.message import ComsMessage, construct_message
 from orbitalcoms.coms.strategies.serialstrat import SerialComsStrategy
@@ -25,6 +27,23 @@ def pseudotty():
     yield m, s
     os.close(m)
     os.close(s)
+
+
+def test_open_on_construct(pseudotty):
+    m, _ = pseudotty
+    m_name = os.ttyname(m)
+    ser = serial.Serial(port=m_name, baudrate=9600)
+    ser.close()
+    scs = SerialComsStrategy(ser)
+    assert scs.ser.is_open
+
+
+def test_close_on_shutdown(pseudotty):
+    m, _ = pseudotty
+    m_name = os.ttyname(m)
+    scs = SerialComsStrategy.from_args(m_name, 9600)
+    scs._shutdown()
+    assert not scs.ser.is_open
 
 
 def test_port_access(pseudotty):
@@ -73,8 +92,8 @@ def test_write(pseudotty, msg_a, msg_b):
 
     # make sure messages read
     pty_contents = os.read(m, 3000).decode()
-    assert pty_contents.endswith("&")
-    msgs = pty_contents.split("&")
+    assert pty_contents.endswith("\r")
+    msgs = pty_contents.split("\r")
     msgs.pop()
     read = [construct_message(m) for m in msgs]
 

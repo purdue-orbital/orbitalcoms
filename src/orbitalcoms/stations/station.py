@@ -27,7 +27,7 @@ class Station(ABC):
 
     The ``Station`` class handles nitty gritty interaction with ComsDriver
     for the users while providing conveniences such as the keeping track of
-     current mission flags.
+    current mission flags.
 
     The ``Station`` keeps track of last sent and received ComsMessages
     wholesale along with timestamps of their occurence for users to
@@ -101,10 +101,17 @@ class Station(ABC):
         :param tb: [UNUSED] Traceback
         :type tb: TracebackType | None
         """
-        self.__cleanup()
+        self.close()
 
     def __del__(self) -> None:
         """Deconstruct Station"""
+        self.__cleanup()
+
+    def close(self) -> None:
+        """User facing method to dealloc resources.
+
+        NOTE: A station cannot be used after it has been closed
+        """
         self.__cleanup()
 
     def __cleanup(self) -> None:
@@ -251,7 +258,9 @@ class Station(ABC):
                 self._last_sent_time = time.time()
         else:
             # FIXME: This should send an all empty state message
-            logger.warning("No previous message sent to interval again on interval")
+            logger.warning(
+                "Cannot send previous message (No previous message has been sent)"
+            )
 
     def set_send_interval(self, interval: float | None) -> None:
         """Set the amount of time to be sent before the last state should be resent
