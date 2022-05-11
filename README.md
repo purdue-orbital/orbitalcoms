@@ -51,9 +51,52 @@ $ orbitalcoms -h
 ```
 
 
-This will display the command line usage and options for usage. At its most basic usage, OribtalComs # TODO: This
+This will display the command line usage and runtime options.
 
-Example serial usage:
+```sh
+orbitalcoms [-h] [--frontend FRONTEND] [--interval-send INTERVAL_SEND] {socket,serial} ...
+```
+
+
+At its most basic usage, OribtalComs requires a strategy (either a socket connection or a serial port) over which it
+will send messages. Each strategy may require additional parameters. Each strategy usage can be viewed by running
+
+```sh
+$ orbitalcoms <strategy> -h
+```
+
+
+Additionally there are general settings applicable to all OrbitalComs interfaces.
+
+<table align="center" style="width: 70em">
+  <tr>
+    <th style="width: 10em">Setting</th>
+    <th>Description</th>
+    <th style="width: 20em">Possible Values</th>
+  </tr>
+  <tr>
+    <td>--frontend, -f</td>
+    <td>
+      Changes the user interface used by OrbitalComs. Currently, the frontends available are the development GUI, and a
+      headless CLI.
+    </td>
+    <td>dev, headless</td>
+  </tr>
+  <tr>
+    <td>--interval-send, -i</td>
+    <td>
+      OrbitalComs will send a periodic message or "heartbeat" once per an interval (in seconds). OrbitalComs will
+      attempt to resend the last sent message. If no previous message has been sent, OrbitalComs will not send anything
+      when an interval expires.
+    </td>
+    <td>Any number greater than or equal to zero</td>
+  </tr>
+</table>
+
+
+The example command shown below will launch OrbitalComs with a serial connection using a CLI interface and will attempt
+to automatically resend the last sent message every 2 minutes.
+
 ```sh
 $ orbitalcoms -f headless -i 120 serial --port /dev/ttyUSB0 --baudrate 9600
 ```
