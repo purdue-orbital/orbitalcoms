@@ -68,7 +68,7 @@ $ orbitalcoms <strategy> -h
 
 Additionally there are general settings applicable to all OrbitalComs interfaces.
 
-<table align="center" style="width: 70em">
+<table align="center" style="width: 65em">
   <tr>
     <th style="width: 10em">Setting</th>
     <th>Description</th>
