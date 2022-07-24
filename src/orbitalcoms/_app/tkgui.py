@@ -35,7 +35,6 @@ class GroundStationFrame(tk.Frame):
     def __init__(self, gs: GroundStation, *args: Any, **kwargs: Any) -> None:
         super().__init__(*args, **kwargs)
         self._gs = gs
-        self._gs.bind_queue(GroundStationFrame.FrameUpdateQueue(self))
 
         # Config Window
         self.grid(column=0, row=0, sticky="nsew")
@@ -88,6 +87,7 @@ class GroundStationFrame(tk.Frame):
         self.txt_sent = tk.Text(self)
         self.txt_recv = tk.Text(self)
         self.txt_data = tk.Text(self)
+        self._gs.bind_queue(GroundStationFrame.FrameUpdateQueue(self))
 
         self.txt_sent.grid(column=1, row=0, rowspan=5, sticky="nsew")
         self.txt_recv.grid(column=2, row=0, rowspan=5, sticky="nsew")
