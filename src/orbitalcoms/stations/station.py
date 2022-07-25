@@ -5,7 +5,7 @@ import time
 from abc import ABC, abstractmethod
 from threading import Event, Thread
 from types import TracebackType
-from typing import Any, Callable, Dict, Type
+from typing import Any, Callable, Dict, Type, TypeVar
 
 from typing_extensions import Protocol
 
@@ -20,6 +20,10 @@ from ..coms import (
 from ..coms.errors import ComsMessageParseError
 
 logger = make_logger(__name__, logging.WARNING)
+
+# TODO: Replace this with `Self Type` on release of Python 3.11 (& w/ mypy support)
+# See PEP 673 for more details: https://peps.python.org/pep-0673/
+TStation = TypeVar("TStation", bound="Station")
 
 
 class Station(ABC):
@@ -73,7 +77,7 @@ class Station(ABC):
         self._coms.register_subscriber(ComsSubscription(receive))
         self._coms.start_read_loop()
 
-    def __enter__(self) -> Station:
+    def __enter__(self: TStation) -> TStation:
         """Ctx manage a station
 
         Context meanaged stations will clean up their resources

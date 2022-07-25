@@ -2,10 +2,13 @@ from __future__ import annotations
 
 import multiprocessing as mp
 import time
-from typing import List, Set, Tuple
+from typing import TYPE_CHECKING, Set, Tuple
 
 from ..messages import ComsMessage, construct_message
 from .strategy import ComsStrategy
+
+if TYPE_CHECKING:
+    from multiprocessing.managers import ListProxy
 
 
 class LocalComsStrategy(ComsStrategy):
@@ -15,7 +18,7 @@ class LocalComsStrategy(ComsStrategy):
         self._listening: Set[LocalComsStrategy] = set()
 
         # needs to be shared bc read is often in different proc than write
-        self._messages: List[str] = mp.Manager().list()
+        self._messages: ListProxy[str] = mp.Manager().list()
 
     def read(self) -> ComsMessage:
         """Wait for and return a message placed in the

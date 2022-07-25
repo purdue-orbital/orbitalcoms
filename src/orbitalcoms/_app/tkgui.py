@@ -178,7 +178,6 @@ def run_app(gs: GroundStation) -> None:
             "Quit",
             "Are you sure you want to close the Dev GUI?",
         ):
-            gs.close()
             root.destroy()
 
     # Bind Protocols
