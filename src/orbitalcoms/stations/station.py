@@ -21,9 +21,9 @@ from ..coms.errors import ComsMessageParseError
 
 logger = make_logger(__name__, logging.WARNING)
 
-# TODO: Replace this with `Self Type` on release of Python 3.11 (& w/ mypy support)
+# TODO: Replace this with `Self Type` on release of mypy support for PEP 673
 # See PEP 673 for more details: https://peps.python.org/pep-0673/
-TStation = TypeVar("TStation", bound="Station")
+_TStation = TypeVar("_TStation", bound="Station")
 
 
 class Station(ABC):
@@ -77,7 +77,7 @@ class Station(ABC):
         self._coms.register_subscriber(ComsSubscription(receive))
         self._coms.start_read_loop()
 
-    def __enter__(self: TStation) -> TStation:
+    def __enter__(self: _TStation) -> _TStation:
         """Ctx manage a station
 
         Context meanaged stations will clean up their resources
