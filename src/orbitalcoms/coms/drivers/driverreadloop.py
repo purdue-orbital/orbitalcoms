@@ -5,7 +5,7 @@ import multiprocessing as mp
 import traceback
 from multiprocessing.connection import Connection
 from threading import Event, Thread
-from typing import TYPE_CHECKING, Any, Callable, Tuple
+from typing import TYPE_CHECKING, Any, Callable, Tuple, cast
 
 from ..._utils import log
 
@@ -89,12 +89,11 @@ class ComsDriverReadLoop(Thread):
             main process
         :rtype: Tuple[multiprocessing.Process, multiprocessing.connection.Connection]
         """
-        a, b = mp.Pipe()
+        # Technically a tuple[PipeConnection, PipeConnection] on win32 w/ py>=3.11
+        # but it has the same public api, so good enough for now
+        a, b = cast(tuple[Connection, Connection], mp.Pipe())
 
-        return (
-            mp.Process(target=_get_msg, args=(self._coms_strat, a), daemon=True),
-            b,
-        )
+        return mp.Process(target=_get_msg, args=(self._coms_strat, a), daemon=True), b
 
     def stop(self, timeout: float | None = None) -> None:
         """A method to set events to safly end thread and
