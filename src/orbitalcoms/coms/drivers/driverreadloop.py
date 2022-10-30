@@ -3,7 +3,7 @@ from __future__ import annotations
 import logging
 import multiprocessing as mp
 import traceback
-from multiprocessing.connection import Connection
+from multiprocessing.connection import _ConnectionBase
 from threading import Event, Thread
 from typing import TYPE_CHECKING, Any, Callable, Tuple
 
@@ -73,7 +73,7 @@ class ComsDriverReadLoop(Thread):
         if proc.is_alive():
             proc.terminate()
 
-    def _spawn_get_msg_proc(self) -> Tuple[mp.Process, Connection]:
+    def _spawn_get_msg_proc(self) -> Tuple[mp.Process, _ConnectionBase]:
         """Method to create resources needed to wait for  and read next message.
 
         Because reading the next ComsMessage is can be implimented as a blocking
@@ -87,14 +87,11 @@ class ComsDriverReadLoop(Thread):
 
         :return: A process to read a message and connection to communicate with
             main process
-        :rtype: Tuple[multiprocessing.Process, multiprocessing.connection.Connection]
+        :rtype: Tuple[multiprocessing.Process, multiprocessing.connection._ConnectionBase]
         """
         a, b = mp.Pipe()
 
-        return (
-            mp.Process(target=_get_msg, args=(self._coms_strat, a), daemon=True),
-            b,
-        )
+        return mp.Process(target=_get_msg, args=(self._coms_strat, a), daemon=True), b
 
     def stop(self, timeout: float | None = None) -> None:
         """A method to set events to safly end thread and
@@ -108,7 +105,7 @@ class ComsDriverReadLoop(Thread):
         self.join(timeout=timeout)
 
 
-def _get_msg(strat: ComsStrategy, conn: Connection) -> None:
+def _get_msg(strat: ComsStrategy, conn: _ConnectionBase) -> None:
     """Function run to get receive next message
 
     Due to the fact that strategies often have blocking read methods,
@@ -122,7 +119,7 @@ def _get_msg(strat: ComsStrategy, conn: Connection) -> None:
     :type strat: ComsStrategy
     :param conn: A connection by which to send data back
         to the main process
-    :type conn: multiprocessing.connection.Connection
+    :type conn: multiprocessing.connection._ConnectionBase
     """
     try:
         conn.send(strat.read())

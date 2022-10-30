@@ -51,14 +51,14 @@ def main() -> None:
     else:
         raise ValueError("Could not determine how to manage communication")
 
-    gs = GroundStation(coms)
-    gs.set_send_interval(args.interval_send)
-    if args.frontend == "dev":
-        tkgui.run_app(gs)
-    elif args.frontend == "headless":
-        headless.run_app(gs)
-    else:
-        raise ValueError("Failed to find selected frontend")
+    with GroundStation(coms) as gs:
+        gs.set_send_interval(args.interval_send)
+        if args.frontend == "dev":
+            tkgui.run_app(gs)
+        elif args.frontend == "headless":
+            headless.run_app(gs)
+        else:
+            raise ValueError("Failed to find selected frontend")
 
 
 def get_args() -> BaseArgs:
